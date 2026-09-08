@@ -13,8 +13,15 @@
         android:theme="@style/Theme.LabsCM20262Gr03">
 
         <activity
+            android:name=".PersonalDataActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            />
+
+        <activity
             android:name=".ContactDataActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize"
             />
 
         <activity

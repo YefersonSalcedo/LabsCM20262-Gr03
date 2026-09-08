@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import co.edu.udea.compumovil.labscm20262_gr03.ui.theme.LabsCM20262Gr03Theme
 
 class MainActivity : ComponentActivity() {
@@ -24,6 +25,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             LabsCM20262Gr03Theme {
                 MainScreen(
+                    onPersonalDataClick = {
+                        val intent = Intent(
+                            this,
+                            PersonalDataActivity::class.java
+                        )
+                        startActivity(intent)
+                    },
                     onContactDataClick = {
                         val intent = Intent(
                             this,
@@ -39,17 +47,24 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen(
+    onPersonalDataClick: () -> Unit,
     onContactDataClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
         Text(
             text = "Laboratorio CM"
         )
+
+        Button(
+            onClick = onPersonalDataClick
+        ) {
+            Text("Información personal")
+        }
 
         Button(
             onClick = onContactDataClick
