@@ -16,7 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
@@ -25,10 +31,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import co.edu.udea.compumovil.labscm20262_gr03.navigation.DatosPersonalesRecibidos
 import co.edu.udea.compumovil.labscm20262_gr03.navigation.obtenerDatosPersonales
+import co.edu.udea.compumovil.labscm20262_gr03.ui.theme.LabsCM20262Gr03Theme
 
 
 class ContactDataActivity : ComponentActivity() {
@@ -50,8 +60,8 @@ class ContactDataActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Integrante 3 - Navegación: se reciben los datos personales
-        // enviados desde PersonalDataActivity vía Intent extras.
+        // Se reciben los datos personales enviados desde
+        // PersonalDataActivity vía Intent extras.
         val datosPersonales = intent.obtenerDatosPersonales()
 
         setContent {
@@ -60,12 +70,7 @@ class ContactDataActivity : ComponentActivity() {
     }
 }
 
-private const val TAG_LOG = "LabCM_DatosUsuario"
-
-/**
- * Integrante 3 - Escribe en Logcat el resumen final, siguiendo
- * exactamente el formato pedido en el enunciado.
- */
+private const val TAG_LOG = "DatosUsuario"
 private fun registrarDatosEnLogcat(
     personales: DatosPersonalesRecibidos,
     telefono: String,
@@ -158,10 +163,10 @@ fun ContactDataScreen(
     var ciudadExpandida by remember { mutableStateOf(false) }
 
     val telefonoFocus = remember { FocusRequester() }
-    val direccionFocus = remember { FocusRequester() }
     val emailFocus = remember { FocusRequester() }
     val paisFocus = remember { FocusRequester() }
     val ciudadFocus = remember { FocusRequester() }
+    val direccionFocus = remember { FocusRequester() }
 
     val teclado = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
@@ -176,25 +181,26 @@ fun ContactDataScreen(
     ) {
 
         Text(
-            text = "Información de contacto"
+            text = "Información de Contacto",
+            fontWeight = FontWeight.Bold
         )
 
+        // 1. Teléfono
         OutlinedTextField(
             value = telefono,
             onValueChange = { viewModel.actualizarTelefono(it) },
+            leadingIcon = { Icon(Icons.Default.Call, contentDescription = null) },
             label = { Text("Teléfono") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Phone,
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(
-                onNext = {
-                    direccionFocus.requestFocus()
-                }
+                onNext = { emailFocus.requestFocus() }
             ),
-            isError = mostrarErrores && telefono.trim().length <7,
+            isError = mostrarErrores && telefono.trim().length < 7,
             supportingText = {
-                if(mostrarErrores && telefono.trim().length < 7){
+                if (mostrarErrores && telefono.trim().length < 7) {
                     Text("Ingresa un teléfono válido")
                 }
             },
@@ -208,48 +214,29 @@ fun ContactDataScreen(
                 },
         )
 
-        OutlinedTextField(
-            value = direccion,
-            onValueChange = { viewModel.actualizarDireccion(it) },
-            label = { Text("Dirección") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next,
-                autoCorrectEnabled = false
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    emailFocus.requestFocus()
-                }
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(direccionFocus)
-        )
-
+        // 2. Correo
         OutlinedTextField(
             value = email,
             onValueChange = { viewModel.actualizarEmail(it) },
+            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             label = { Text("Correo electrónico") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(
-                onNext = {
-                    paisFocus.requestFocus()
-                }
+                onNext = { paisFocus.requestFocus() }
             ),
             isError = mostrarErrores &&
                     !Patterns.EMAIL_ADDRESS
                         .matcher(email.trim())
                         .matches(),
             supportingText = {
-                if(mostrarErrores &&
+                if (mostrarErrores &&
                     !Patterns.EMAIL_ADDRESS
                         .matcher(email.trim())
                         .matches()
-                ){
+                ) {
                     Text("Ingresa un correo válido")
                 }
             },
@@ -258,24 +245,21 @@ fun ContactDataScreen(
                 .focusRequester(emailFocus)
         )
 
+        // 3. País
         ExposedDropdownMenuBox(
             expanded = paisExpandido,
-            onExpandedChange = {
-                paisExpandido = !paisExpandido
-            }
+            onExpandedChange = { paisExpandido = !paisExpandido }
         ) {
-
             OutlinedTextField(
                 value = pais,
                 onValueChange = {
                     viewModel.actualizarPais(it)
                     paisExpandido = true
                 },
+                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
                 label = { Text("País") },
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = paisExpandido
-                    )
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = paisExpandido)
                 },
                 isError = mostrarErrores && pais.isBlank(),
                 keyboardOptions = KeyboardOptions(
@@ -283,9 +267,7 @@ fun ContactDataScreen(
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
-                    onNext = {
-                        ciudadFocus.requestFocus()
-                    }
+                    onNext = { ciudadFocus.requestFocus() }
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -295,28 +277,15 @@ fun ContactDataScreen(
 
             ExposedDropdownMenu(
                 expanded = paisExpandido,
-                onDismissRequest = {
-                    paisExpandido = false
-                }
+                onDismissRequest = { paisExpandido = false }
             ) {
-
                 paisesLatinoamerica
-                    .filter {
-                        it.contains(
-                            pais,
-                            ignoreCase = true
-                        )
-                    }
+                    .filter { it.contains(pais, ignoreCase = true) }
                     .forEach { paisSeleccionado ->
-
                         DropdownMenuItem(
-                            text = {
-                                Text(paisSeleccionado)
-                            },
+                            text = { Text(paisSeleccionado) },
                             onClick = {
-                                viewModel.actualizarPais(
-                                    paisSeleccionado
-                                )
+                                viewModel.actualizarPais(paisSeleccionado)
                                 paisExpandido = false
                                 ciudadFocus.requestFocus()
                             }
@@ -325,28 +294,28 @@ fun ContactDataScreen(
             }
         }
 
+        // 4. Ciudad
         ExposedDropdownMenuBox(
             expanded = ciudadExpandida,
-            onExpandedChange = {
-                ciudadExpandida = !ciudadExpandida
-            }
+            onExpandedChange = { ciudadExpandida = !ciudadExpandida }
         ) {
-
             OutlinedTextField(
                 value = ciudad,
                 onValueChange = {
                     viewModel.actualizarCiudad(it)
                     ciudadExpandida = true
                 },
+                leadingIcon = { Icon(Icons.Default.Home, contentDescription = null) },
                 label = { Text("Ciudad") },
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = ciudadExpandida
-                    )
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = ciudadExpandida)
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { direccionFocus.requestFocus() }
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -356,34 +325,38 @@ fun ContactDataScreen(
 
             ExposedDropdownMenu(
                 expanded = ciudadExpandida,
-                onDismissRequest = {
-                    ciudadExpandida = false
-                }
+                onDismissRequest = { ciudadExpandida = false }
             ) {
-
                 ciudadesColombia
-                    .filter {
-                        it.contains(
-                            ciudad,
-                            ignoreCase = true
-                        )
-                    }
+                    .filter { it.contains(ciudad, ignoreCase = true) }
                     .forEach { ciudadSeleccionada ->
-
                         DropdownMenuItem(
-                            text = {
-                                Text(ciudadSeleccionada)
-                            },
+                            text = { Text(ciudadSeleccionada) },
                             onClick = {
-                                viewModel.actualizarCiudad(
-                                    ciudadSeleccionada
-                                )
+                                viewModel.actualizarCiudad(ciudadSeleccionada)
                                 ciudadExpandida = false
                             }
                         )
                     }
             }
         }
+
+        // 5. Dirección
+        OutlinedTextField(
+            value = direccion,
+            onValueChange = { viewModel.actualizarDireccion(it) },
+            leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
+            label = { Text("Dirección") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+                autoCorrectEnabled = false
+            ),
+            visualTransformation = VisualTransformation.None,
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(direccionFocus)
+        )
 
         Button(
             onClick = {
@@ -414,11 +387,17 @@ fun ContactDataScreen(
                     ).show()
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(ciudadFocus)
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Continuar")
+            Text("Siguiente")
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Contacto - Portrait")
+@Composable
+fun ContactDataScreenPreview() {
+    LabsCM20262Gr03Theme {
+        ContactDataScreen(viewModel = ContactDataViewModel())
     }
 }

@@ -9,14 +9,6 @@ import android.content.Intent
  * ContactDataActivity. Define las claves de los Intent extras y el
  * modelo de datos personales que viaja entre ambas Activities.
  */
-
-/**
- * Claves usadas para pasar los datos de PersonalDataActivity hacia
- * ContactDataActivity mediante Intent extras.
- *
- * Se centralizan aquí para que ambas Activities usen exactamente el
- * mismo nombre de clave y no haya errores de tipeo.
- */
 object DatosPersonalesExtras {
     const val NOMBRES = "extra_nombres"
     const val APELLIDOS = "extra_apellidos"
