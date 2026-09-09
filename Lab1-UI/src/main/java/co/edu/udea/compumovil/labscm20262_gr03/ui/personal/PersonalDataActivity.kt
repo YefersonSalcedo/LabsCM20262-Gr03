@@ -49,6 +49,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -56,6 +58,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.edu.udea.compumovil.labscm20262_gr03.R
 import co.edu.udea.compumovil.labscm20262_gr03.navigation.DatosPersonalesExtras
 import co.edu.udea.compumovil.labscm20262_gr03.ui.contact.ContactDataActivity
 import co.edu.udea.compumovil.labscm20262_gr03.ui.theme.LabsCM20262Gr03Theme
@@ -80,12 +83,7 @@ class PersonalDataActivity : ComponentActivity() {
 @Composable
 fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
 
-    val gradosEscolaridad = listOf(
-        "Primaria",
-        "Secundaria",
-        "Universitaria",
-        "Otro"
-    )
+    val gradosEscolaridad = stringArrayResource(R.array.grados_escolaridad).toList()
 
     val nombres by viewModel.nombres.collectAsState()
     val apellidos by viewModel.apellidos.collectAsState()
@@ -146,14 +144,14 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         gradoFocus.requestFocus()
                     }
                 ) {
-                    Text("Aceptar")
+                    Text(stringResource(R.string.accion_aceptar))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { mostrarDatePicker = false }
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.accion_cancelar))
                 }
             }
         ) {
@@ -164,7 +162,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
     val campoNombres: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier = modifier) {
             Text(
-                text = "Nombres",
+                text = stringResource(R.string.personal_label_nombres),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 4.dp)
@@ -189,7 +187,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 isError = mostrarErrores && nombres.trim().isEmpty(),
                 supportingText = {
                     if (mostrarErrores && nombres.trim().isEmpty()) {
-                        Text("Campo obligatorio")
+                        Text(stringResource(R.string.error_campo_obligatorio))
                     }
                 },
                 modifier = Modifier
@@ -202,7 +200,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
     val campoApellidos: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier = modifier) {
             Text(
-                text = "Apellidos",
+                text = stringResource(R.string.personal_label_apellidos),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 4.dp)
@@ -227,7 +225,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 isError = mostrarErrores && apellidos.trim().isEmpty(),
                 supportingText = {
                     if (mostrarErrores && apellidos.trim().isEmpty()) {
-                        Text("Campo obligatorio")
+                        Text(stringResource(R.string.error_campo_obligatorio))
                     }
                 },
                 modifier = Modifier
@@ -242,7 +240,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
             modifier = modifier,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Sexo:", fontWeight = FontWeight.Medium)
+            Text(text = stringResource(R.string.personal_label_sexo), fontWeight = FontWeight.Medium)
 
             RadioButton(
                 selected = sexo == "Masculino",
@@ -254,7 +252,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     .padding(start = 8.dp)
                     .focusRequester(sexoFocus)
             )
-            Text(text = "Hombre")
+            Text(text = stringResource(R.string.personal_sexo_hombre))
 
             RadioButton(
                 selected = sexo == "Femenino",
@@ -264,7 +262,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 },
                 modifier = Modifier.padding(start = 8.dp)
             )
-            Text(text = "Mujer")
+            Text(text = stringResource(R.string.personal_sexo_mujer))
         }
     }
 
@@ -281,7 +279,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 ) {
                     Icon(Icons.Default.DateRange, contentDescription = null)
                     Text(
-                        text = "Fecha de Nacimiento:",
+                        text = stringResource(R.string.personal_label_fecha_nacimiento),
                         modifier = Modifier.padding(start = 8.dp),
                         fontWeight = FontWeight.Medium
                     )
@@ -291,13 +289,13 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     onClick = { mostrarDatePicker = true },
                     modifier = Modifier.focusRequester(fechaFocus)
                 ) {
-                    Text(if (fechaNacimiento.isEmpty()) "Cambiar" else fechaNacimiento)
+                    Text(if (fechaNacimiento.isEmpty()) stringResource(R.string.accion_cambiar) else fechaNacimiento)
                 }
             }
 
             if (mostrarErrores && fechaNacimiento.isEmpty()) {
                 Text(
-                    text = "Campo obligatorio",
+                    text = stringResource(R.string.error_campo_obligatorio),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 4.dp)
@@ -309,7 +307,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
     val campoGrado: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier = modifier) {
             Text(
-                text = "Grado de escolaridad",
+                text = stringResource(R.string.personal_label_grado_escolaridad),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 4.dp)
@@ -361,7 +359,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
             onClick = irAContacto,
             modifier = modifier
         ) {
-            Text("Siguiente")
+            Text(stringResource(R.string.accion_siguiente))
         }
     }
 
@@ -377,7 +375,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Información Personal", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.personal_titulo_pantalla), fontWeight = FontWeight.Bold)
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -423,7 +421,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Información Personal", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.personal_titulo_pantalla), fontWeight = FontWeight.Bold)
 
             campoNombres(Modifier.fillMaxWidth())
             campoApellidos(Modifier.fillMaxWidth())

@@ -1,0 +1,94 @@
+<resources>
+    <string name="app_name">LabsCM20262-Gr03</string>
+
+    <!-- MainActivity -->
+    <string name="main_titulo">Lab 1 - Group 03</string>
+    <string name="main_integrante_1">Yeferson Alexis Salcedo Preciado</string>
+    <string name="main_integrante_2">Jhoan Esteban Echeverri Villa</string>
+    <string name="main_integrante_3">Yeison Ochoa Cárdenas</string>
+    <string name="main_opcion_personal_titulo">Personal information</string>
+    <string name="main_opcion_personal_desc">Name, date of birth and more</string>
+    <string name="main_opcion_contacto_titulo">Contact information</string>
+    <string name="main_opcion_contacto_desc">Phone, email, country and city</string>
+
+    <!-- Common -->
+    <string name="accion_aceptar">Accept</string>
+    <string name="accion_cancelar">Cancel</string>
+    <string name="accion_cambiar">Change</string>
+    <string name="accion_siguiente">Next</string>
+    <string name="error_campo_obligatorio">Required field</string>
+
+    <!-- PersonalDataActivity -->
+    <string name="personal_titulo_pantalla">Personal Information</string>
+    <string name="personal_label_nombres">First name</string>
+    <string name="personal_label_apellidos">Last name</string>
+    <string name="personal_label_sexo">Sex:</string>
+    <string name="personal_sexo_hombre">Male</string>
+    <string name="personal_sexo_mujer">Female</string>
+    <string name="personal_label_fecha_nacimiento">Date of Birth:</string>
+    <string name="personal_label_grado_escolaridad">Education level</string>
+
+    <string-array name="grados_escolaridad">
+        <item>Elementary school</item>
+        <item>High school</item>
+        <item>University</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- ContactDataActivity -->
+    <string name="contacto_titulo_pantalla">Contact Information</string>
+    <string name="contacto_label_telefono">Phone</string>
+    <string name="contacto_error_telefono">Enter a valid phone number</string>
+    <string name="contacto_label_email">Email</string>
+    <string name="contacto_error_email">Enter a valid email</string>
+    <string name="contacto_label_pais">Country</string>
+    <string name="contacto_label_ciudad">City</string>
+    <string name="contacto_label_direccion">Address</string>
+    <string name="contacto_mensaje_exito">Data saved. Check Logcat.</string>
+    <string name="contacto_mensaje_datos_previos_faltantes">Required Personal Information fields are missing</string>
+
+    <string-array name="paises_latinoamerica">
+        <item>Argentina</item>
+        <item>Bolivia</item>
+        <item>Brazil</item>
+        <item>Chile</item>
+        <item>Colombia</item>
+        <item>Costa Rica</item>
+        <item>Cuba</item>
+        <item>Ecuador</item>
+        <item>El Salvador</item>
+        <item>Guatemala</item>
+        <item>Honduras</item>
+        <item>Mexico</item>
+        <item>Nicaragua</item>
+        <item>Panama</item>
+        <item>Paraguay</item>
+        <item>Peru</item>
+        <item>Dominican Republic</item>
+        <item>Uruguay</item>
+        <item>Venezuela</item>
+    </string-array>
+
+    <string-array name="ciudades_colombia">
+        <item>Bogotá</item>
+        <item>Medellín</item>
+        <item>Cali</item>
+        <item>Barranquilla</item>
+        <item>Cartagena</item>
+        <item>Cúcuta</item>
+        <item>Bucaramanga</item>
+        <item>Pereira</item>
+        <item>Santa Marta</item>
+        <item>Ibagué</item>
+        <item>Manizales</item>
+        <item>Villavicencio</item>
+        <item>Pasto</item>
+        <item>Montería</item>
+        <item>Neiva</item>
+        <item>Armenia</item>
+        <item>Valledupar</item>
+        <item>Sincelejo</item>
+        <item>Popayán</item>
+        <item>Tunja</item>
+    </string-array>
+</resources>

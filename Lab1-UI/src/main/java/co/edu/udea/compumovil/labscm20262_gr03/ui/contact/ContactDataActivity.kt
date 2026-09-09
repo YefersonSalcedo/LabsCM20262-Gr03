@@ -39,6 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
@@ -52,6 +54,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import co.edu.udea.compumovil.labscm20262_gr03.R
 import co.edu.udea.compumovil.labscm20262_gr03.navigation.DatosPersonalesRecibidos
 import co.edu.udea.compumovil.labscm20262_gr03.navigation.obtenerDatosPersonales
 import co.edu.udea.compumovil.labscm20262_gr03.ui.theme.LabsCM20262Gr03Theme
@@ -112,50 +115,8 @@ fun ContactDataScreen(
     datosPersonales: DatosPersonalesRecibidos = DatosPersonalesRecibidos()
 ) {
 
-    val paisesLatinoamerica = listOf(
-        "Argentina",
-        "Bolivia",
-        "Brasil",
-        "Chile",
-        "Colombia",
-        "Costa Rica",
-        "Cuba",
-        "Ecuador",
-        "El Salvador",
-        "Guatemala",
-        "Honduras",
-        "México",
-        "Nicaragua",
-        "Panamá",
-        "Paraguay",
-        "Perú",
-        "República Dominicana",
-        "Uruguay",
-        "Venezuela"
-    )
-
-    val ciudadesColombia = listOf(
-        "Bogotá",
-        "Medellín",
-        "Cali",
-        "Barranquilla",
-        "Cartagena",
-        "Cúcuta",
-        "Bucaramanga",
-        "Pereira",
-        "Santa Marta",
-        "Ibagué",
-        "Manizales",
-        "Villavicencio",
-        "Pasto",
-        "Montería",
-        "Neiva",
-        "Armenia",
-        "Valledupar",
-        "Sincelejo",
-        "Popayán",
-        "Tunja"
-    )
+    val paisesLatinoamerica = stringArrayResource(R.array.paises_latinoamerica).toList()
+    val ciudadesColombia = stringArrayResource(R.array.ciudades_colombia).toList()
 
     val telefono by viewModel.telefono.collectAsState()
     val direccion by viewModel.direccion.collectAsState()
@@ -181,7 +142,7 @@ fun ContactDataScreen(
     val campoTelefono: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier = modifier) {
             Text(
-                text = "Teléfono",
+                text = stringResource(R.string.contacto_label_telefono),
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
@@ -199,7 +160,7 @@ fun ContactDataScreen(
                 isError = mostrarErrores && telefono.trim().length < 7,
                 supportingText = {
                     if (mostrarErrores && telefono.trim().length < 7) {
-                        Text("Ingresa un teléfono válido")
+                        Text(stringResource(R.string.contacto_error_telefono))
                     }
                 },
                 modifier = Modifier
@@ -217,7 +178,7 @@ fun ContactDataScreen(
     val campoEmail: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier = modifier) {
             Text(
-                text = "Correo electrónico",
+                text = stringResource(R.string.contacto_label_email),
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
@@ -242,7 +203,7 @@ fun ContactDataScreen(
                             .matcher(email.trim())
                             .matches()
                     ) {
-                        Text("Ingresa un correo válido")
+                        Text(stringResource(R.string.contacto_error_email))
                     }
                 },
                 modifier = Modifier
@@ -255,7 +216,7 @@ fun ContactDataScreen(
     val campoPais: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier = modifier) {
             Text(
-                text = "País",
+                text = stringResource(R.string.contacto_label_pais),
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
@@ -312,7 +273,7 @@ fun ContactDataScreen(
     val campoCiudad: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier = modifier) {
             Text(
-                text = "Ciudad",
+                text = stringResource(R.string.contacto_label_ciudad),
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
@@ -367,7 +328,7 @@ fun ContactDataScreen(
     val campoDireccion: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier = modifier) {
             Text(
-                text = "Dirección",
+                text = stringResource(R.string.contacto_label_direccion),
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
@@ -405,7 +366,7 @@ fun ContactDataScreen(
                     )
                     Toast.makeText(
                         context,
-                        "Datos registrados. Revisa el Logcat.",
+                        context.getString(R.string.contacto_mensaje_exito),
                         Toast.LENGTH_LONG
                     ).show()
                 } else if (contactoValido && !datosPersonales.sonValidos) {
@@ -413,14 +374,14 @@ fun ContactDataScreen(
                     // correctamente la información personal.
                     Toast.makeText(
                         context,
-                        "Faltan datos obligatorios de la Información personal",
+                        context.getString(R.string.contacto_mensaje_datos_previos_faltantes),
                         Toast.LENGTH_LONG
                     ).show()
                 }
             },
             modifier = modifier
         ) {
-            Text("Siguiente")
+            Text(stringResource(R.string.accion_siguiente))
         }
     }
 
@@ -435,7 +396,7 @@ fun ContactDataScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Información de Contacto", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.contacto_titulo_pantalla), fontWeight = FontWeight.Bold)
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -470,7 +431,7 @@ fun ContactDataScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Información de Contacto", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.contacto_titulo_pantalla), fontWeight = FontWeight.Bold)
 
             campoTelefono(Modifier.fillMaxWidth())
             campoEmail(Modifier.fillMaxWidth())

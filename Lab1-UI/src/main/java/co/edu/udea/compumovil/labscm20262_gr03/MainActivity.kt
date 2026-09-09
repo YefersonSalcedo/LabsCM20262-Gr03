@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -118,7 +119,7 @@ fun MainScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = "Laboratorio 1 - Grupo 03",
+                    text = stringResource(R.string.main_titulo),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -127,17 +128,17 @@ fun MainScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Yeferson Alexis Salcedo Preciado",
+                    text = stringResource(R.string.main_integrante_1),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Jhoan Esteban Echeverri Villa",
+                    text = stringResource(R.string.main_integrante_2),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Yeison Ochoa Cárdenas",
+                    text = stringResource(R.string.main_integrante_3),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -146,8 +147,8 @@ fun MainScreen(
 
                 // Tarjetas de navegación
                 OpcionMenuCard(
-                    titulo = "Información personal",
-                    descripcion = "Nombres, fecha de nacimiento y más",
+                    titulo = stringResource(R.string.main_opcion_personal_titulo),
+                    descripcion = stringResource(R.string.main_opcion_personal_desc),
                     icono = Icons.Default.Person,
                     onClick = onPersonalDataClick
                 )
@@ -155,8 +156,8 @@ fun MainScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OpcionMenuCard(
-                    titulo = "Información de contacto",
-                    descripcion = "Teléfono, correo, país y ciudad",
+                    titulo = stringResource(R.string.main_opcion_contacto_titulo),
+                    descripcion = stringResource(R.string.main_opcion_contacto_desc),
                     icono = Icons.Default.Call,
                     onClick = onContactDataClick
                 )
