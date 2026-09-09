@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">LabsCM20262-Gr03</string>
+    <string name="lab_title">Laboratorio CM</string>
+    <string name="personal_info">Información personal</string>
+    <string name="contact_info">Información de contacto</string>
+    <string name="names">Nombres</string>
+    <string name="surnames">Apellidos</string>
+    <string name="sex">Sexo</string>
+    <string name="male">Masculino</string>
+    <string name="female">Femenino</string>
+    <string name="birth_date">Fecha de nacimiento</string>
+    <string name="select_date">Cambiar</string>
+    <string name="education_level">Grado de escolaridad</string>
+    <string name="primary">Primaria</string>
+    <string name="secondary">Secundaria</string>
+    <string name="university">Universitaria</string>
+    <string name="other">Otro</string>
+    <string name="continue_btn">Continuar</string>
+    <string name="phone">Teléfono</string>
+    <string name="address">Dirección</string>
+    <string name="email">Correo electrónico</string>
+    <string name="country">País</string>
+    <string name="city">Ciudad</string>
+    <string name="required_field">Campo obligatorio</string>
+    <string name="valid_phone">Ingresa un teléfono válido</string>
+    <string name="valid_email">Ingresa un correo válido</string>
+    <string name="accept">Aceptar</string>
+    <string name="cancel">Cancelar</string>
 </resources>

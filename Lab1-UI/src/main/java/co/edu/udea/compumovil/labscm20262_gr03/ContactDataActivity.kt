@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
@@ -34,6 +35,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import co.edu.udea.compumovil.labscm20262_gr03.R
 
 
 class ContactDataActivity : ComponentActivity() {
@@ -125,13 +127,13 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
     ) {
 
         Text(
-            text = "Información de contacto"
+            text = stringResource(R.string.contact_info)
         )
 
         OutlinedTextField(
             value = telefono,
             onValueChange = { viewModel.actualizarTelefono(it) },
-            label = { Text("Teléfono") },
+            label = { Text(stringResource(R.string.phone)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Phone,
                 imeAction = ImeAction.Next
@@ -144,7 +146,7 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
             isError = mostrarErrores && telefono.trim().length <7,
             supportingText = {
                 if(mostrarErrores && telefono.trim().length < 7){
-                    Text("Ingresa un teléfono válido")
+                    Text(stringResource(R.string.valid_phone))
                 }
             },
             modifier = Modifier
@@ -160,7 +162,7 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
         OutlinedTextField(
             value = direccion,
             onValueChange = { viewModel.actualizarDireccion(it) },
-            label = { Text("Dirección") },
+            label = { Text(stringResource(R.string.address)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next,
@@ -179,7 +181,7 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
         OutlinedTextField(
             value = email,
             onValueChange = { viewModel.actualizarEmail(it) },
-            label = { Text("Correo electrónico") },
+            label = { Text(stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -199,7 +201,7 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
                         .matcher(email.trim())
                         .matches()
                     ){
-                    Text("Ingresa un correo válido")
+                    Text(stringResource(R.string.valid_email))
                 }
             },
             modifier = Modifier
@@ -220,7 +222,7 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
                     viewModel.actualizarPais(it)
                     paisExpandido = true
                 },
-                label = { Text("País") },
+                label = { Text(stringResource(R.string.country)) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(
                         expanded = paisExpandido
@@ -287,7 +289,7 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
                     viewModel.actualizarCiudad(it)
                     ciudadExpandida = true
                 },
-                label = { Text("Ciudad") },
+                label = { Text(stringResource(R.string.city)) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(
                         expanded = ciudadExpandida
@@ -342,7 +344,7 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
                 .fillMaxWidth()
                 .focusRequester(ciudadFocus)
         ) {
-            Text("Continuar")
+            Text(stringResource(R.string.continue_btn))
         }
     }
 }

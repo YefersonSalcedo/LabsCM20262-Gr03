@@ -13,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import co.edu.udea.compumovil.labscm20262_gr03.ui.theme.LabsCM20262Gr03Theme
 
@@ -57,19 +59,19 @@ fun MainScreen(
     ) {
 
         Text(
-            text = "Laboratorio CM"
+            text = stringResource(R.string.lab_title)
         )
 
         Button(
             onClick = onPersonalDataClick
         ) {
-            Text("Información personal")
+            Text(stringResource(R.string.personal_info))
         }
 
         Button(
             onClick = onContactDataClick
         ) {
-            Text("Información de contacto")
+            Text(stringResource(R.string.contact_info))
         }
     }
 }

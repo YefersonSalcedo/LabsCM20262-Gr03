@@ -44,9 +44,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import co.edu.udea.compumovil.labscm20262_gr03.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -69,11 +71,14 @@ class PersonalDataActivity : ComponentActivity() {
 fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
 
     val gradosEscolaridad = listOf(
-        "Primaria",
-        "Secundaria",
-        "Universitaria",
-        "Otro"
+        stringResource(R.string.primary),
+        stringResource(R.string.secondary),
+        stringResource(R.string.university),
+        stringResource(R.string.other)
     )
+
+    val maleText = stringResource(R.string.male)
+    val femaleText = stringResource(R.string.female)
 
     val nombres by viewModel.nombres.collectAsState()
     val apellidos by viewModel.apellidos.collectAsState()
@@ -117,14 +122,14 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         gradoFocus.requestFocus()
                     }
                 ) {
-                    Text("Aceptar")
+                    Text(stringResource(R.string.accept))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { mostrarDatePicker = false }
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
@@ -147,7 +152,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(text = "Información Personal")
+                Text(text = stringResource(R.string.personal_info))
 
                 OutlinedTextField(
                     value = nombres,
@@ -155,11 +160,11 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         val capitalizado = it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                         viewModel.actualizarNombres(capitalizado)
                     },
-                    label = { Text("Nombres") },
+                    label = { Text(stringResource(R.string.names)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
                         imeAction = ImeAction.Next,
-                        capitalization = KeyboardCapitalization.Sentences,
+                        capitalization = KeyboardCapitalization.Words,
                         autoCorrectEnabled = false
                     ),
                     keyboardActions = KeyboardActions(
@@ -170,7 +175,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     isError = mostrarErrores && nombres.trim().isEmpty(),
                     supportingText = {
                         if (mostrarErrores && nombres.trim().isEmpty()) {
-                            Text("Campo obligatorio")
+                            Text(stringResource(R.string.required_field))
                         }
                     },
                     modifier = Modifier
@@ -184,11 +189,11 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         val capitalizado = it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                         viewModel.actualizarApellidos(capitalizado)
                     },
-                    label = { Text("Apellidos") },
+                    label = { Text(stringResource(R.string.surnames)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
                         imeAction = ImeAction.Next,
-                        capitalization = KeyboardCapitalization.Sentences,
+                        capitalization = KeyboardCapitalization.Words,
                         autoCorrectEnabled = false
                     ),
                     keyboardActions = KeyboardActions(
@@ -199,7 +204,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     isError = mostrarErrores && apellidos.trim().isEmpty(),
                     supportingText = {
                         if (mostrarErrores && apellidos.trim().isEmpty()) {
-                            Text("Campo obligatorio")
+                            Text(stringResource(R.string.required_field))
                         }
                     },
                     modifier = Modifier
@@ -214,7 +219,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(text = "Sexo")
+                Text(text = stringResource(R.string.sex))
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -224,15 +229,15 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = sexo == "Masculino",
+                            selected = sexo == maleText,
                             onClick = {
-                                viewModel.actualizarSexo("Masculino")
+                                viewModel.actualizarSexo(maleText)
                                 fechaFocus.requestFocus()
                             },
                             modifier = Modifier.focusRequester(sexoFocus)
                         )
                         Text(
-                            text = "Masculino",
+                            text = maleText,
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
@@ -241,23 +246,23 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = sexo == "Femenino",
+                            selected = sexo == femaleText,
                             onClick = {
-                                viewModel.actualizarSexo("Femenino")
+                                viewModel.actualizarSexo(femaleText)
                                 fechaFocus.requestFocus()
                             }
                         )
                         Text(
-                            text = "Femenino",
+                            text = femaleText,
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
                 }
 
                 Column {
-                    Text("Fecha de nacimiento")
+                    Text(stringResource(R.string.birth_date))
                     if (mostrarErrores && fechaNacimiento.isEmpty()) {
-                        Text("Campo obligatorio", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.required_field), color = androidx.compose.material3.MaterialTheme.colorScheme.error)
                     }
                 }
                 Button(
@@ -266,7 +271,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         .fillMaxWidth()
                         .focusRequester(fechaFocus)
                 ) {
-                    Text(if (fechaNacimiento.isEmpty()) "Cambiar" else fechaNacimiento)
+                    Text(if (fechaNacimiento.isEmpty()) stringResource(R.string.select_date) else fechaNacimiento)
                 }
 
                 ExposedDropdownMenuBox(
@@ -281,7 +286,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                             viewModel.actualizarGradoEscolaridad(it)
                             gradoExpandido = true
                         },
-                        label = { Text("Grado de escolaridad") },
+                        label = { Text(stringResource(R.string.education_level)) },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(
                                 expanded = gradoExpandido
@@ -289,7 +294,8 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
-                            imeAction = ImeAction.Done
+                            imeAction = ImeAction.Next,
+                            autoCorrectEnabled = false
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -326,7 +332,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Continuar")
+                    Text(stringResource(R.string.continue_btn))
                 }
             }
         }
@@ -340,7 +346,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Información Personal"
+                text = stringResource(R.string.personal_info)
             )
 
             OutlinedTextField(
@@ -349,7 +355,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     val capitalizado = it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                     viewModel.actualizarNombres(capitalizado)
                 },
-                label = { Text("Nombres") },
+                label = { Text(stringResource(R.string.names)) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
                     imeAction = ImeAction.Next,
@@ -364,7 +370,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 isError = mostrarErrores && nombres.trim().isEmpty(),
                 supportingText = {
                     if (mostrarErrores && nombres.trim().isEmpty()) {
-                        Text("Campo obligatorio")
+                        Text(stringResource(R.string.required_field))
                     }
                 },
                 modifier = Modifier
@@ -378,7 +384,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     val capitalizado = it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                     viewModel.actualizarApellidos(capitalizado)
                 },
-                label = { Text("Apellidos") },
+                label = { Text(stringResource(R.string.surnames)) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
                     imeAction = ImeAction.Next,
@@ -393,7 +399,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 isError = mostrarErrores && apellidos.trim().isEmpty(),
                 supportingText = {
                     if (mostrarErrores && apellidos.trim().isEmpty()) {
-                        Text("Campo obligatorio")
+                        Text(stringResource(R.string.required_field))
                     }
                 },
                 modifier = Modifier
@@ -401,7 +407,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     .focusRequester(apellidosFocus)
             )
 
-            Text(text = "Sexo")
+            Text(text = stringResource(R.string.sex))
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -411,15 +417,15 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = sexo == "Masculino",
+                        selected = sexo == maleText,
                         onClick = {
-                            viewModel.actualizarSexo("Masculino")
+                            viewModel.actualizarSexo(maleText)
                             fechaFocus.requestFocus()
                         },
                         modifier = Modifier.focusRequester(sexoFocus)
                     )
                     Text(
-                        text = "Masculino",
+                        text = maleText,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
@@ -428,23 +434,23 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = sexo == "Femenino",
+                        selected = sexo == femaleText,
                         onClick = {
-                            viewModel.actualizarSexo("Femenino")
+                            viewModel.actualizarSexo(femaleText)
                             fechaFocus.requestFocus()
                         }
                     )
                     Text(
-                        text = "Femenino",
+                        text = femaleText,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
             }
 
             Column {
-                Text("Fecha de nacimiento")
+                Text(stringResource(R.string.birth_date))
                 if (mostrarErrores && fechaNacimiento.isEmpty()) {
-                    Text("Campo obligatorio", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.required_field), color = androidx.compose.material3.MaterialTheme.colorScheme.error)
                 }
             }
             Button(
@@ -453,7 +459,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     .fillMaxWidth()
                     .focusRequester(fechaFocus)
             ) {
-                Text(if (fechaNacimiento.isEmpty()) "Cambiar" else fechaNacimiento)
+                Text(if (fechaNacimiento.isEmpty()) stringResource(R.string.select_date) else fechaNacimiento)
             }
 
             ExposedDropdownMenuBox(
@@ -468,7 +474,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         viewModel.actualizarGradoEscolaridad(it)
                         gradoExpandido = true
                     },
-                    label = { Text("Grado de escolaridad") },
+                    label = { Text(stringResource(R.string.education_level)) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(
                             expanded = gradoExpandido
@@ -513,7 +519,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Continuar")
+                Text(stringResource(R.string.continue_btn))
             }
         }
     }
