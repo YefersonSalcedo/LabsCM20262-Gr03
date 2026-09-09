@@ -1,6 +1,7 @@
-package co.edu.udea.compumovil.labscm20262_gr03
+package co.edu.udea.compumovil.labscm20262_gr03.ui.contact
 
 import android.os.Bundle
+import android.util.Patterns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -32,6 +33,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
@@ -50,7 +52,7 @@ class ContactDataActivity : ComponentActivity() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@androidx.compose.runtime.Composable
+@Composable
 fun ContactDataScreen(viewModel: ContactDataViewModel) {
 
     val paisesLatinoamerica = listOf(
@@ -190,12 +192,12 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
                 }
             ),
             isError = mostrarErrores &&
-                    !android.util.Patterns.EMAIL_ADDRESS
+                    !Patterns.EMAIL_ADDRESS
                         .matcher(email.trim())
                         .matches(),
             supportingText = {
                 if(mostrarErrores &&
-                    !android.util.Patterns.EMAIL_ADDRESS
+                    !Patterns.EMAIL_ADDRESS
                         .matcher(email.trim())
                         .matches()
                     ){

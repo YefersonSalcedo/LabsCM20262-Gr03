@@ -1,4 +1,4 @@
-package co.edu.udea.compumovil.labscm20262_gr03
+package co.edu.udea.compumovil.labscm20262_gr03.ui.personal
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

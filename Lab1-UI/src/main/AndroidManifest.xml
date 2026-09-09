@@ -13,13 +13,13 @@
         android:theme="@style/Theme.LabsCM20262Gr03">
 
         <activity
-            android:name=".PersonalDataActivity"
+            android:name=".ui.personal.PersonalDataActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"
             />
 
         <activity
-            android:name=".ContactDataActivity"
+            android:name=".ui.contact.ContactDataActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"
             />

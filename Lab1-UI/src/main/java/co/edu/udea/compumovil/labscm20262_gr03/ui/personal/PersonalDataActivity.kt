@@ -1,5 +1,6 @@
-package co.edu.udea.compumovil.labscm20262_gr03
+package co.edu.udea.compumovil.labscm20262_gr03.ui.personal
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,11 +27,9 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,11 +40,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -93,7 +92,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
 
     val teclado = LocalSoftwareKeyboardController.current
     val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val datePickerState = rememberDatePickerState(
         selectableDates = object : SelectableDates {
@@ -157,7 +156,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     },
                     label = { Text("Nombres") },
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+                        keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next,
                         capitalization = KeyboardCapitalization.Sentences,
                         autoCorrectEnabled = false
@@ -186,7 +185,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     },
                     label = { Text("Apellidos") },
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+                        keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next,
                         capitalization = KeyboardCapitalization.Sentences,
                         autoCorrectEnabled = false
@@ -257,7 +256,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 Column {
                     Text("Fecha de nacimiento")
                     if (mostrarErrores && fechaNacimiento.isEmpty()) {
-                        Text("Campo obligatorio", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
+                        Text("Campo obligatorio", color = MaterialTheme.colorScheme.error)
                     }
                 }
                 Button(
@@ -288,7 +287,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                             )
                         },
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+                            keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Done
                         ),
                         modifier = Modifier
@@ -351,7 +350,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 },
                 label = { Text("Nombres") },
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next,
                     capitalization = KeyboardCapitalization.Sentences,
                     autoCorrectEnabled = false
@@ -380,7 +379,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 },
                 label = { Text("Apellidos") },
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next,
                     capitalization = KeyboardCapitalization.Sentences,
                     autoCorrectEnabled = false
@@ -444,7 +443,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
             Column {
                 Text("Fecha de nacimiento")
                 if (mostrarErrores && fechaNacimiento.isEmpty()) {
-                    Text("Campo obligatorio", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
+                    Text("Campo obligatorio", color = MaterialTheme.colorScheme.error)
                 }
             }
             Button(
@@ -475,7 +474,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                         )
                     },
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+                        keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Done
                     ),
                     modifier = Modifier

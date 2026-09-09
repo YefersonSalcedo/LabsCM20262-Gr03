@@ -1,5 +1,6 @@
-package co.edu.udea.compumovil.labscm20262_gr03
+package co.edu.udea.compumovil.labscm20262_gr03.ui.contact
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,7 +46,7 @@ class ContactDataViewModel : ViewModel() {
     fun datosValidos(): Boolean {
         val telefonoValido = telefono.value.trim().length >= 7
 
-        val emailValido = android.util.Patterns.EMAIL_ADDRESS
+        val emailValido = Patterns.EMAIL_ADDRESS
             .matcher(email.value.trim())
             .matches()
 

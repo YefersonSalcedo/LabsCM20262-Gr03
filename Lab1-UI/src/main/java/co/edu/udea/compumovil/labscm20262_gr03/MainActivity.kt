@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import co.edu.udea.compumovil.labscm20262_gr03.ui.contact.ContactDataActivity
+import co.edu.udea.compumovil.labscm20262_gr03.ui.personal.PersonalDataActivity
 import co.edu.udea.compumovil.labscm20262_gr03.ui.theme.LabsCM20262Gr03Theme
 
 class MainActivity : ComponentActivity() {
