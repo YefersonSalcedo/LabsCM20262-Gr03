@@ -482,7 +482,8 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
-                        imeAction = ImeAction.Done
+                        imeAction = ImeAction.Done,
+                        autoCorrectEnabled = false
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
