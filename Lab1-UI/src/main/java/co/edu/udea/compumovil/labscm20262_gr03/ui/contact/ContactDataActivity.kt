@@ -1,7 +1,9 @@
 package co.edu.udea.compumovil.labscm20262_gr03.ui.contact
 
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -35,7 +37,10 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import co.edu.udea.compumovil.labscm20262_gr03.navigation.DatosPersonalesRecibidos
+import co.edu.udea.compumovil.labscm20262_gr03.navigation.obtenerDatosPersonales
 
 
 class ContactDataActivity : ComponentActivity() {
@@ -45,15 +50,58 @@ class ContactDataActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Integrante 3 - Navegación: se reciben los datos personales
+        // enviados desde PersonalDataActivity vía Intent extras.
+        val datosPersonales = intent.obtenerDatosPersonales()
+
         setContent {
-            ContactDataScreen(viewModel)
+            ContactDataScreen(viewModel, datosPersonales)
         }
+    }
+}
+
+private const val TAG_LOG = "LabCM_DatosUsuario"
+
+/**
+ * Integrante 3 - Escribe en Logcat el resumen final, siguiendo
+ * exactamente el formato pedido en el enunciado.
+ */
+private fun registrarDatosEnLogcat(
+    personales: DatosPersonalesRecibidos,
+    telefono: String,
+    direccion: String,
+    email: String,
+    pais: String,
+    ciudad: String
+) {
+    Log.d(TAG_LOG, "Información personal:")
+    Log.d(TAG_LOG, "${personales.nombres} ${personales.apellidos}")
+    if (personales.sexo.isNotBlank()) {
+        Log.d(TAG_LOG, personales.sexo)
+    }
+    Log.d(TAG_LOG, "Nació el ${personales.fechaNacimiento}")
+    if (personales.gradoEscolaridad.isNotBlank()) {
+        Log.d(TAG_LOG, personales.gradoEscolaridad)
+    }
+
+    Log.d(TAG_LOG, "Información de contacto:")
+    Log.d(TAG_LOG, "Teléfono: $telefono")
+    if (direccion.isNotBlank()) {
+        Log.d(TAG_LOG, "Dirección: $direccion")
+    }
+    Log.d(TAG_LOG, "Email: $email")
+    Log.d(TAG_LOG, "País: $pais")
+    if (ciudad.isNotBlank()) {
+        Log.d(TAG_LOG, "Ciudad: $ciudad")
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactDataScreen(viewModel: ContactDataViewModel) {
+fun ContactDataScreen(
+    viewModel: ContactDataViewModel,
+    datosPersonales: DatosPersonalesRecibidos = DatosPersonalesRecibidos()
+) {
 
     val paisesLatinoamerica = listOf(
         "Argentina",
@@ -116,6 +164,7 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
     val ciudadFocus = remember { FocusRequester() }
 
     val teclado = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -200,7 +249,7 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
                     !Patterns.EMAIL_ADDRESS
                         .matcher(email.trim())
                         .matches()
-                    ){
+                ){
                     Text("Ingresa un correo válido")
                 }
             },
@@ -338,7 +387,32 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
 
         Button(
             onClick = {
-                mostrarErrores = !viewModel.datosValidos()
+                val contactoValido = viewModel.datosValidos()
+                mostrarErrores = !contactoValido
+
+                if (contactoValido && datosPersonales.sonValidos) {
+                    registrarDatosEnLogcat(
+                        personales = datosPersonales,
+                        telefono = telefono,
+                        direccion = direccion,
+                        email = email,
+                        pais = pais,
+                        ciudad = ciudad
+                    )
+                    Toast.makeText(
+                        context,
+                        "Datos registrados. Revisa el Logcat.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else if (contactoValido && !datosPersonales.sonValidos) {
+                    // Caso borde: se llegó a esta pantalla sin completar
+                    // correctamente la información personal.
+                    Toast.makeText(
+                        context,
+                        "Faltan datos obligatorios de la Información personal",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -348,4 +422,3 @@ fun ContactDataScreen(viewModel: ContactDataViewModel) {
         }
     }
 }
-

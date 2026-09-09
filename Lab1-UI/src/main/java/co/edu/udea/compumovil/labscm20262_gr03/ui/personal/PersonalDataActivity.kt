@@ -1,5 +1,6 @@
 package co.edu.udea.compumovil.labscm20262_gr03.ui.personal
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -41,11 +42,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import co.edu.udea.compumovil.labscm20262_gr03.navigation.DatosPersonalesExtras
+import co.edu.udea.compumovil.labscm20262_gr03.ui.contact.ContactDataActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -93,6 +97,24 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
     val teclado = LocalSoftwareKeyboardController.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val context = LocalContext.current
+
+    // Integrante 3 - Navegación: al validar los datos obligatorios de esta
+    // pantalla, se envían como Intent extras hacia ContactDataActivity.
+    val irAContacto: () -> Unit = {
+        mostrarErrores = !viewModel.datosValidos()
+        if (!mostrarErrores) {
+            val datos = viewModel.obtenerDatosValidados()
+            val intent = Intent(context, ContactDataActivity::class.java).apply {
+                putExtra(DatosPersonalesExtras.NOMBRES, datos.nombres)
+                putExtra(DatosPersonalesExtras.APELLIDOS, datos.apellidos)
+                putExtra(DatosPersonalesExtras.SEXO, datos.sexo)
+                putExtra(DatosPersonalesExtras.FECHA_NACIMIENTO, datos.fechaNacimiento)
+                putExtra(DatosPersonalesExtras.GRADO_ESCOLARIDAD, datos.gradoEscolaridad)
+            }
+            context.startActivity(intent)
+        }
+    }
 
     val datePickerState = rememberDatePickerState(
         selectableDates = object : SelectableDates {
@@ -150,7 +172,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
 
                 OutlinedTextField(
                     value = nombres,
-                    onValueChange = { 
+                    onValueChange = {
                         val capitalizado = it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                         viewModel.actualizarNombres(capitalizado)
                     },
@@ -179,7 +201,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
 
                 OutlinedTextField(
                     value = apellidos,
-                    onValueChange = { 
+                    onValueChange = {
                         val capitalizado = it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                         viewModel.actualizarApellidos(capitalizado)
                     },
@@ -317,12 +339,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 }
 
                 Button(
-                    onClick = {
-                        mostrarErrores = !viewModel.datosValidos()
-                        if (!mostrarErrores) {
-                            val datos = viewModel.obtenerDatosValidados()
-                        }
-                    },
+                    onClick = irAContacto,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Continuar")
@@ -344,7 +361,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
 
             OutlinedTextField(
                 value = nombres,
-                onValueChange = { 
+                onValueChange = {
                     val capitalizado = it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                     viewModel.actualizarNombres(capitalizado)
                 },
@@ -373,7 +390,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
 
             OutlinedTextField(
                 value = apellidos,
-                onValueChange = { 
+                onValueChange = {
                     val capitalizado = it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
                     viewModel.actualizarApellidos(capitalizado)
                 },
@@ -504,12 +521,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
             }
 
             Button(
-                onClick = {
-                    mostrarErrores = !viewModel.datosValidos()
-                    if (!mostrarErrores) {
-                        val datos = viewModel.obtenerDatosValidados()
-                    }
-                },
+                onClick = irAContacto,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Continuar")
