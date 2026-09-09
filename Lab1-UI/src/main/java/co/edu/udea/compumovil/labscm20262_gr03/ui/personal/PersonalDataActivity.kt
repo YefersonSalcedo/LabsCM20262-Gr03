@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -160,145 +162,195 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
     }
 
     val campoNombres: @Composable (Modifier) -> Unit = { modifier ->
-        OutlinedTextField(
-            value = nombres,
-            onValueChange = {
-                val capitalizado = it.replaceFirstChar { c -> if (c.isLowerCase()) c.titlecase(Locale.getDefault()) else c.toString() }
-                viewModel.actualizarNombres(capitalizado)
-            },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-            label = { Text("Nombres") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next,
-                capitalization = KeyboardCapitalization.Sentences,
-                autoCorrectEnabled = false
-            ),
-            visualTransformation = VisualTransformation.None,
-            keyboardActions = KeyboardActions(
-                onNext = { apellidosFocus.requestFocus() }
-            ),
-            isError = mostrarErrores && nombres.trim().isEmpty(),
-            supportingText = {
-                if (mostrarErrores && nombres.trim().isEmpty()) {
-                    Text("Campo obligatorio")
-                }
-            },
-            modifier = modifier.focusRequester(nombresFocus)
-        )
+        Column(modifier = modifier) {
+            Text(
+                text = "Nombres",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            OutlinedTextField(
+                value = nombres,
+                onValueChange = {
+                    val capitalizado = it.replaceFirstChar { c -> if (c.isLowerCase()) c.titlecase(Locale.getDefault()) else c.toString() }
+                    viewModel.actualizarNombres(capitalizado)
+                },
+                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next,
+                    capitalization = KeyboardCapitalization.Sentences,
+                    autoCorrectEnabled = false
+                ),
+                visualTransformation = VisualTransformation.None,
+                keyboardActions = KeyboardActions(
+                    onNext = { apellidosFocus.requestFocus() }
+                ),
+                isError = mostrarErrores && nombres.trim().isEmpty(),
+                supportingText = {
+                    if (mostrarErrores && nombres.trim().isEmpty()) {
+                        Text("Campo obligatorio")
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(nombresFocus)
+            )
+        }
     }
 
     val campoApellidos: @Composable (Modifier) -> Unit = { modifier ->
-        OutlinedTextField(
-            value = apellidos,
-            onValueChange = {
-                val capitalizado = it.replaceFirstChar { c -> if (c.isLowerCase()) c.titlecase(Locale.getDefault()) else c.toString() }
-                viewModel.actualizarApellidos(capitalizado)
-            },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-            label = { Text("Apellidos") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next,
-                capitalization = KeyboardCapitalization.Sentences,
-                autoCorrectEnabled = false
-            ),
-            visualTransformation = VisualTransformation.None,
-            keyboardActions = KeyboardActions(
-                onNext = { sexoFocus.requestFocus() }
-            ),
-            isError = mostrarErrores && apellidos.trim().isEmpty(),
-            supportingText = {
-                if (mostrarErrores && apellidos.trim().isEmpty()) {
-                    Text("Campo obligatorio")
-                }
-            },
-            modifier = modifier.focusRequester(apellidosFocus)
-        )
+        Column(modifier = modifier) {
+            Text(
+                text = "Apellidos",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            OutlinedTextField(
+                value = apellidos,
+                onValueChange = {
+                    val capitalizado = it.replaceFirstChar { c -> if (c.isLowerCase()) c.titlecase(Locale.getDefault()) else c.toString() }
+                    viewModel.actualizarApellidos(capitalizado)
+                },
+                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next,
+                    capitalization = KeyboardCapitalization.Sentences,
+                    autoCorrectEnabled = false
+                ),
+                visualTransformation = VisualTransformation.None,
+                keyboardActions = KeyboardActions(
+                    onNext = { sexoFocus.requestFocus() }
+                ),
+                isError = mostrarErrores && apellidos.trim().isEmpty(),
+                supportingText = {
+                    if (mostrarErrores && apellidos.trim().isEmpty()) {
+                        Text("Campo obligatorio")
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(apellidosFocus)
+            )
+        }
     }
 
     val filaSexo: @Composable (Modifier) -> Unit = { modifier ->
-        Column(modifier = modifier) {
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(text = "Sexo:", fontWeight = FontWeight.Medium)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = sexo == "Masculino",
-                    onClick = {
-                        viewModel.actualizarSexo("Masculino")
-                        fechaFocus.requestFocus()
-                    },
-                    modifier = Modifier.focusRequester(sexoFocus)
-                )
-                Text(text = "Hombre")
 
-                RadioButton(
-                    selected = sexo == "Femenino",
-                    onClick = {
-                        viewModel.actualizarSexo("Femenino")
-                        fechaFocus.requestFocus()
-                    }
-                )
-                Text(text = "Mujer")
-            }
+            RadioButton(
+                selected = sexo == "Masculino",
+                onClick = {
+                    viewModel.actualizarSexo("Masculino")
+                    fechaFocus.requestFocus()
+                },
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .focusRequester(sexoFocus)
+            )
+            Text(text = "Hombre")
+
+            RadioButton(
+                selected = sexo == "Femenino",
+                onClick = {
+                    viewModel.actualizarSexo("Femenino")
+                    fechaFocus.requestFocus()
+                },
+                modifier = Modifier.padding(start = 8.dp)
+            )
+            Text(text = "Mujer")
         }
     }
 
     val filaFecha: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier = modifier) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.DateRange, contentDescription = null)
-                Text(
-                    text = "Fecha de Nacimiento:",
-                    modifier = Modifier.padding(start = 8.dp),
-                    fontWeight = FontWeight.Medium
-                )
-            }
-            if (mostrarErrores && fechaNacimiento.isEmpty()) {
-                Text("Campo obligatorio", color = MaterialTheme.colorScheme.error)
-            }
-            Button(
-                onClick = { mostrarDatePicker = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(fechaFocus)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(if (fechaNacimiento.isEmpty()) "Cambiar" else fechaNacimiento)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f, fill = false)
+                ) {
+                    Icon(Icons.Default.DateRange, contentDescription = null)
+                    Text(
+                        text = "Fecha de Nacimiento:",
+                        modifier = Modifier.padding(start = 8.dp),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Button(
+                    onClick = { mostrarDatePicker = true },
+                    modifier = Modifier.focusRequester(fechaFocus)
+                ) {
+                    Text(if (fechaNacimiento.isEmpty()) "Cambiar" else fechaNacimiento)
+                }
+            }
+
+            if (mostrarErrores && fechaNacimiento.isEmpty()) {
+                Text(
+                    text = "Campo obligatorio",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
         }
     }
 
     val campoGrado: @Composable (Modifier) -> Unit = { modifier ->
-        ExposedDropdownMenuBox(
-            expanded = gradoExpandido,
-            onExpandedChange = { gradoExpandido = !gradoExpandido },
-            modifier = modifier
-        ) {
-            OutlinedTextField(
-                value = gradoEscolaridad,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Grado de escolaridad") },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = gradoExpandido)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor()
-                    .focusRequester(gradoFocus)
+        Column(modifier = modifier) {
+            Text(
+                text = "Grado de escolaridad",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(bottom = 4.dp)
             )
-
-            ExposedDropdownMenu(
+            ExposedDropdownMenuBox(
                 expanded = gradoExpandido,
-                onDismissRequest = { gradoExpandido = false }
+                onExpandedChange = { gradoExpandido = !gradoExpandido },
+                modifier = Modifier.fillMaxWidth()
             ) {
-                gradosEscolaridad.forEach { grado ->
-                    DropdownMenuItem(
-                        text = { Text(grado) },
-                        onClick = {
-                            viewModel.actualizarGradoEscolaridad(grado)
-                            gradoExpandido = false
-                        }
-                    )
+                OutlinedTextField(
+                    value = gradoEscolaridad,
+                    onValueChange = {},
+                    readOnly = true,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.School,
+                            contentDescription = null
+                        )
+                    },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = gradoExpandido)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                        .focusRequester(gradoFocus)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = gradoExpandido,
+                    onDismissRequest = { gradoExpandido = false }
+                ) {
+                    gradosEscolaridad.forEach { grado ->
+                        DropdownMenuItem(
+                            text = { Text(grado) },
+                            onClick = {
+                                viewModel.actualizarGradoEscolaridad(grado)
+                                gradoExpandido = false
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -339,8 +391,18 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.Top
             ) {
-                filaSexo(Modifier.weight(1f))
-                filaFecha(Modifier.weight(1f))
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    filaSexo(Modifier)
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    filaFecha(Modifier)
+                }
             }
 
             Row(
@@ -368,7 +430,7 @@ fun PersonalDataScreen(viewModel: PersonalDataViewModel) {
             filaSexo(Modifier.fillMaxWidth())
             filaFecha(Modifier.fillMaxWidth())
             campoGrado(Modifier.fillMaxWidth())
-            botonSiguiente(Modifier.fillMaxWidth())
+            botonSiguiente(Modifier.align(Alignment.End))
         }
     }
 }
