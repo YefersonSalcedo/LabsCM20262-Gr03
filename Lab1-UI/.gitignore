@@ -3,3 +3,6 @@
 .idea/
 *.iml
 local.properties
+*.jks
+*.keystore
+/release/
