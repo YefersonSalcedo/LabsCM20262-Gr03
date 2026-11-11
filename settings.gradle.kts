@@ -24,4 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "LabsCM20262-Gr03"
 include(":Lab1-UI")
- 
+include(":lab2-workers")
