@@ -57,4 +57,11 @@
     <string name="cd_navigate_home">Navigate to the home screen</string>
     <string name="cd_navigate_interests">Navigate to the interests screen</string>
 
+    <!-- Notifications -->
+    <string name="channel_name">New articles</string>
+    <plurals name="new_articles">
+        <item quantity="one">%d new article</item>
+        <item quantity="other">%d new articles</item>
+    </plurals>
+
 </resources>
