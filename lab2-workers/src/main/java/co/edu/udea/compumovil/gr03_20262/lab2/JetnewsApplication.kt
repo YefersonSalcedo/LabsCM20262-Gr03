@@ -19,6 +19,7 @@ package co.edu.udea.compumovil.gr03_20262.lab2
 import android.app.Application
 import co.edu.udea.compumovil.gr03_20262.lab2.data.AppContainer
 import co.edu.udea.compumovil.gr03_20262.lab2.data.AppContainerImpl
+import co.edu.udea.compumovil.gr03_20262.lab2.work.SyncScheduler
 
 class JetnewsApplication : Application() {
     companion object {
@@ -31,5 +32,6 @@ class JetnewsApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         container = AppContainerImpl(this)
+        SyncScheduler.schedulePeriodic(this)
     }
 }
