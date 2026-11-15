@@ -118,7 +118,6 @@ class HomeViewModel(private val postsRepository: PostsRepository) : ViewModel() 
         )
 
     init {
-        refreshPosts()
 
         // Observe for favorite changes in the repo layer
         viewModelScope.launch {

@@ -102,6 +102,8 @@ import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.ListDetailScene
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.theme.JetnewsTheme
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 
 @Serializable
 data object HomeKey : NavKey
@@ -167,6 +169,10 @@ fun HomeScreen(
 ) {
     // UiState of the HomeScreen
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        homeViewModel.refreshPosts()
+    }
 
     HomeFeedScreen(
         uiState = uiState,
@@ -252,12 +258,12 @@ private fun HomeScreenWithList(
     Scaffold(
         snackbarHost = { JetnewsSnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            if (showTopAppBar) {
-                HomeTopAppBar(
-                    openDrawer = openDrawer,
-                    topAppBarState = topAppBarState,
-                )
-            }
+            HomeTopAppBar(
+                openDrawer = openDrawer,
+                onSyncCompleted = onRefreshPosts,
+                showNavigationIcon = showTopAppBar,
+                topAppBarState = topAppBarState,
+            )
         },
         modifier = modifier,
     ) { innerPadding ->
@@ -608,7 +614,7 @@ private fun submitSearch(onSearchInputChanged: (String) -> Unit, context: Contex
     onSearchInputChanged("")
     Toast.makeText(
         context,
-        "Search is not yet implemented",
+        context.getString(R.string.search_not_implemented),
         Toast.LENGTH_SHORT,
     ).show()
 }
@@ -620,44 +626,38 @@ private fun submitSearch(onSearchInputChanged: (String) -> Unit, context: Contex
 @Composable
 private fun HomeTopAppBar(
     openDrawer: () -> Unit,
+    onSyncCompleted: () -> Unit,
+    showNavigationIcon: Boolean,
     modifier: Modifier = Modifier,
     topAppBarState: TopAppBarState = rememberTopAppBarState(),
     scrollBehavior: TopAppBarScrollBehavior? =
         TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState),
 ) {
-    val context = LocalContext.current
-    val title = stringResource(id = R.string.app_name)
     CenterAlignedTopAppBar(
         title = {
-            Image(
-                painter = painterResource(R.drawable.ic_jetnews_wordmark),
-                contentDescription = title,
-                contentScale = ContentScale.Inside,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                modifier = Modifier.fillMaxWidth(),
+            Text(
+                text = stringResource(R.string.app_name),
+                maxLines = 1,
             )
         },
         navigationIcon = {
-            IconButton(onClick = openDrawer) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_jetnews_logo),
-                    contentDescription = stringResource(R.string.cd_open_navigation_drawer),
-                )
+            if (showNavigationIcon) {
+                IconButton(onClick = openDrawer) {
+                    Icon(
+                        painter = painterResource(
+                            R.drawable.ic_jetnews_logo,
+                        ),
+                        contentDescription = stringResource(
+                            R.string.cd_open_navigation_drawer,
+                        ),
+                    )
+                }
             }
         },
         actions = {
-            IconButton(onClick = {
-                Toast.makeText(
-                    context,
-                    "Search is not yet implemented in this configuration",
-                    Toast.LENGTH_LONG,
-                ).show()
-            }) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_search),
-                    contentDescription = stringResource(R.string.cd_search),
-                )
-            }
+            SyncNowButton(
+                onSyncCompleted = onSyncCompleted,
+            )
         },
         scrollBehavior = scrollBehavior,
         modifier = modifier,

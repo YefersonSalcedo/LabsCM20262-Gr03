@@ -173,6 +173,7 @@ fun VerticalPost(post: Post, bookmarks: Set<String>, onToggleBookmark: (String) 
 
 @Composable
 fun BookmarkButton(id: String, isBookmarked: Boolean, onToggleBookmark: (String) -> Unit) {
+    val context = LocalContext.current
     Image(
         provider = ImageProvider(
             if (isBookmarked) {
@@ -182,7 +183,9 @@ fun BookmarkButton(id: String, isBookmarked: Boolean, onToggleBookmark: (String)
             },
         ),
         colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
-        contentDescription = "${if (isBookmarked) R.string.unbookmark else R.string.bookmark}",
+        contentDescription = context.getString(
+            if (isBookmarked) R.string.unbookmark else R.string.bookmark
+        ),
         modifier = GlanceModifier.clickable { onToggleBookmark(id) },
     )
 }
