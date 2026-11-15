@@ -18,7 +18,6 @@
     <string name="retry">Retry</string>
     <string name="cd_share">Share</string>
     <string name="cd_open_navigation_drawer">Open navigation drawer</string>
-    <string name="cd_sync_now">Sync now</string>
     <string name="unbookmark">Remove bookmark</string>
     <string name="bookmark">Bookmark</string>
     <string name="cd_navigate_up">Navigate up</string>
@@ -47,14 +46,18 @@
     <string name="interests_section_people">People</string>
     <string name="interests_section_publications">Publications</string>
 
-    <!-- Sync -->
-    <string name="sync_started">Sync started</string>
-
     <!-- Notifications -->
     <string name="channel_name">New articles</string>
     <plurals name="new_articles">
         <item quantity="one">%d new article</item>
         <item quantity="other">%d new articles</item>
     </plurals>
+
+    <!-- Synchronization -->
+    <string name="sync_now">Sync now</string>
+    <string name="sync_in_progress">Syncing…</string>
+    <string name="sync_started">Synchronization started</string>
+    <string name="sync_completed">Synchronization completed</string>
+    <string name="sync_failed">Could not synchronize</string>
 
 </resources>

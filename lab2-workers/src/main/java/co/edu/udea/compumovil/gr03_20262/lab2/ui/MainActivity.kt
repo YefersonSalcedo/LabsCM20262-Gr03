@@ -37,13 +37,49 @@ import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.rememberInitialBackS
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.utils.NewIntentEffect
 
 class MainActivity : ComponentActivity() {
+    private val notificationPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) {
+            // La aplicación sigue funcionando aunque se niegue el permiso.
+            // NotifyWorker ya verifica el permiso antes de notificar.
+        }
 
-    private val notificationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { }
+    private fun requestNotificationPermissionOnce() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return
+        }
 
-    private val preferences by lazy {
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val permissionGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (permissionGranted) {
+            return
+        }
+
+        val preferences = getSharedPreferences(
+            "notification_permission",
+            MODE_PRIVATE,
+        )
+
+        val alreadyRequested = preferences.getBoolean(
+            "already_requested",
+            false,
+        )
+
+        if (alreadyRequested) {
+            return
+        }
+
+        preferences.edit()
+            .putBoolean("already_requested", true)
+            .apply()
+
+        notificationPermissionLauncher.launch(
+            Manifest.permission.POST_NOTIFICATIONS,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,23 +108,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun requestNotificationPermissionOnce() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-        if (preferences.getBoolean(KEY_NOTIFICATION_PERMISSION_REQUESTED, false)) return
-
-        preferences.edit()
-            .putBoolean(KEY_NOTIFICATION_PERMISSION_REQUESTED, true)
-            .apply()
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }
-
-    companion object {
-        private const val PREFS_NAME = "app_preferences"
-        private const val KEY_NOTIFICATION_PERMISSION_REQUESTED = "notification_permission_requested"
-    }
 }

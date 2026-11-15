@@ -17,7 +17,6 @@
 package co.edu.udea.compumovil.gr03_20262.lab2.ui.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -58,20 +57,13 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -80,14 +72,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import co.edu.udea.compumovil.gr03_20262.lab2.R
 import co.edu.udea.compumovil.gr03_20262.lab2.data.Result
 import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.PostsRepository
@@ -98,9 +87,6 @@ import co.edu.udea.compumovil.gr03_20262.lab2.model.PostsFeed
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.components.JetnewsSnackbarHost
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.ListDetailScene
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.theme.JetnewsTheme
-import co.edu.udea.compumovil.gr03_20262.lab2.work.SyncScheduler
-import java.util.UUID
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 
@@ -158,33 +144,9 @@ fun HomeScreen(
 ) {
     // UiState of the HomeScreen
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val snackbarScope = rememberCoroutineScope()
-    var syncWorkId by remember { mutableStateOf<UUID?>(null) }
-    val lifecycleOwner = LocalLifecycleOwner.current
 
-    DisposableEffect(lifecycleOwner, homeViewModel) {
-        var hasResumed = false
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                if (hasResumed) {
-                    homeViewModel.refreshPosts()
-                } else {
-                    hasResumed = true
-                }
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
-
-    LaunchedEffect(syncWorkId) {
-        val workId = syncWorkId ?: return@LaunchedEffect
-        WorkManager.getInstance(context).getWorkInfoByIdFlow(workId).collect { workInfo ->
-            if (workInfo?.state == WorkInfo.State.SUCCEEDED) {
-                homeViewModel.refreshPosts()
-            }
-        }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        homeViewModel.refreshPosts()
     }
 
     HomeFeedScreen(
@@ -193,12 +155,6 @@ fun HomeScreen(
         onToggleFavorite = { homeViewModel.toggleFavourite(it) },
         onSelectPost = { navigateToPost(it) },
         onRefreshPosts = { homeViewModel.refreshPosts() },
-        onSyncNow = {
-            syncWorkId = SyncScheduler.syncNow(context)
-            snackbarScope.launch {
-                snackbarHostState.showSnackbar(context.getString(R.string.sync_started))
-            }
-        },
         onErrorDismiss = { homeViewModel.errorShown(it) },
         openDrawer = openDrawer,
         homeListLazyListState = rememberLazyListState(),
@@ -214,7 +170,6 @@ fun HomeFeedScreen(
     onToggleFavorite: (String) -> Unit,
     onSelectPost: (String) -> Unit,
     onRefreshPosts: () -> Unit,
-    onSyncNow: () -> Unit = {},
     onErrorDismiss: (Long) -> Unit,
     openDrawer: () -> Unit,
     homeListLazyListState: LazyListState,
@@ -225,7 +180,6 @@ fun HomeFeedScreen(
         uiState = uiState,
         showTopAppBar = showTopAppBar,
         onRefreshPosts = onRefreshPosts,
-        onSyncNow = onSyncNow,
         onErrorDismiss = onErrorDismiss,
         openDrawer = openDrawer,
         snackbarHostState = snackbarHostState,
@@ -250,7 +204,6 @@ private fun HomeScreenWithList(
     uiState: HomeUiState,
     showTopAppBar: Boolean,
     onRefreshPosts: () -> Unit,
-    onSyncNow: () -> Unit,
     onErrorDismiss: (Long) -> Unit,
     openDrawer: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -266,14 +219,13 @@ private fun HomeScreenWithList(
     Scaffold(
         snackbarHost = { JetnewsSnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            if (showTopAppBar) {
-                HomeTopAppBar(
-                    openDrawer = openDrawer,
-                    onSyncNow = onSyncNow,
-                    topAppBarState = topAppBarState,
-                    scrollBehavior = scrollBehavior,
-                )
-            }
+            HomeTopAppBar(
+                openDrawer = openDrawer,
+                onSyncCompleted = onRefreshPosts,
+                showNavigationIcon = showTopAppBar,
+                topAppBarState = topAppBarState,
+                scrollBehavior = scrollBehavior,
+            )
         },
         modifier = modifier,
     ) { innerPadding ->
@@ -523,38 +475,38 @@ private fun PostListDivider() {
 @Composable
 private fun HomeTopAppBar(
     openDrawer: () -> Unit,
-    onSyncNow: () -> Unit,
+    onSyncCompleted: () -> Unit,
+    showNavigationIcon: Boolean,
     modifier: Modifier = Modifier,
     topAppBarState: TopAppBarState = rememberTopAppBarState(),
     scrollBehavior: TopAppBarScrollBehavior? =
         TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState),
 ) {
-    val title = stringResource(id = R.string.app_name)
     CenterAlignedTopAppBar(
         title = {
-            Image(
-                painter = painterResource(R.drawable.ic_jetnews_wordmark),
-                contentDescription = title,
-                contentScale = ContentScale.Inside,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                modifier = Modifier.fillMaxWidth(),
+            Text(
+                text = stringResource(R.string.app_name),
+                maxLines = 1,
             )
         },
         navigationIcon = {
-            IconButton(onClick = openDrawer) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_jetnews_logo),
-                    contentDescription = stringResource(R.string.cd_open_navigation_drawer),
-                )
+            if (showNavigationIcon) {
+                IconButton(onClick = openDrawer) {
+                    Icon(
+                        painter = painterResource(
+                            R.drawable.ic_jetnews_logo,
+                        ),
+                        contentDescription = stringResource(
+                            R.string.cd_open_navigation_drawer,
+                        ),
+                    )
+                }
             }
         },
         actions = {
-            IconButton(onClick = onSyncNow) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_refresh),
-                    contentDescription = stringResource(R.string.cd_sync_now),
-                )
-            }
+            SyncNowButton(
+                onSyncCompleted = onSyncCompleted,
+            )
         },
         scrollBehavior = scrollBehavior,
         modifier = modifier,
