@@ -64,4 +64,16 @@
         <item quantity="other">%d new articles</item>
     </plurals>
 
+    <!-- Synchronization -->
+    <string name="sync_now">Sync now</string>
+    <string name="sync_in_progress">Syncing…</string>
+    <string name="sync_started">Synchronization started</string>
+    <string name="sync_completed">Synchronization completed</string>
+    <string name="sync_failed">Could not synchronize</string>
+
+    <!-- Remaining interface messages -->
+    <string name="search_not_implemented">Search is not yet implemented</string>
+    <string name="search_not_implemented_configuration">Search is not yet implemented in this configuration</string>
+    <string name="post_not_found">Post not found</string>
+
 </resources>

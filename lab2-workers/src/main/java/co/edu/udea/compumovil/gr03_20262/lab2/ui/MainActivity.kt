@@ -30,12 +30,63 @@ import co.edu.udea.compumovil.gr03_20262.lab2.deeplink.handleDeepLink
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.home.HomeKey
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.rememberInitialBackStack
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.utils.NewIntentEffect
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
+    private val notificationPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) {
+            // La aplicación sigue funcionando aunque se niegue el permiso.
+            // NotifyWorker ya verifica el permiso antes de notificar.
+        }
+
+    private fun requestNotificationPermissionOnce() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return
+        }
+
+        val permissionGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (permissionGranted) {
+            return
+        }
+
+        val preferences = getSharedPreferences(
+            "notification_permission",
+            MODE_PRIVATE,
+        )
+
+        val alreadyRequested = preferences.getBoolean(
+            "already_requested",
+            false,
+        )
+
+        if (alreadyRequested) {
+            return
+        }
+
+        preferences.edit()
+            .putBoolean("already_requested", true)
+            .apply()
+
+        notificationPermissionLauncher.launch(
+            Manifest.permission.POST_NOTIFICATIONS,
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        requestNotificationPermissionOnce()
 
         val appContainer = (application as JetnewsApplication).container
         setContent {

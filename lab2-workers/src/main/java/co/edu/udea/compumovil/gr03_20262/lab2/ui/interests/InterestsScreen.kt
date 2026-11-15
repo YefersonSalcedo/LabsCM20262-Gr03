@@ -85,6 +85,7 @@ import co.edu.udea.compumovil.gr03_20262.lab2.ui.theme.JetnewsTheme
 import kotlin.math.max
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
+import androidx.compose.ui.res.stringResource
 
 enum class Sections(@StringRes val titleResId: Int) {
     Topics(R.string.interests_section_topics),
@@ -206,18 +207,21 @@ fun InterestsScreen(
                     }
                 },
                 actions = {
+                    val searchMessage = stringResource(
+                        R.string.search_not_implemented_configuration
+                    )
                     IconButton(
                         onClick = {
                             Toast.makeText(
                                 context,
-                                "Search is not yet implemented in this configuration",
-                                Toast.LENGTH_LONG,
+                                searchMessage,
+                                Toast.LENGTH_LONG
                             ).show()
-                        },
+                        }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_search),
-                            contentDescription = stringResource(R.string.cd_search),
+                            contentDescription = stringResource(R.string.cd_search)
                         )
                     }
                 },
