@@ -23,17 +23,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -129,8 +122,6 @@ fun PostCardSimple(post: Post, navigateToPost: (String) -> Unit, isFavorite: Boo
 
 @Composable
 fun PostCardHistory(post: Post, navigateToPost: (String) -> Unit) {
-    var openDialog by remember { mutableStateOf(false) }
-
     Row(
         Modifier
             .clickable(onClick = { navigateToPost(post.id) }),
@@ -154,40 +145,6 @@ fun PostCardHistory(post: Post, navigateToPost: (String) -> Unit) {
                 modifier = Modifier.padding(top = 4.dp),
             )
         }
-        IconButton(onClick = { openDialog = true }) {
-            Icon(
-                painter = painterResource(R.drawable.ic_more_vert),
-                contentDescription = stringResource(R.string.cd_more_actions),
-            )
-        }
-    }
-    if (openDialog) {
-        AlertDialog(
-            modifier = Modifier.padding(20.dp),
-            onDismissRequest = { openDialog = false },
-            title = {
-                Text(
-                    text = stringResource(id = R.string.fewer_stories),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(id = R.string.fewer_stories_content),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            },
-            confirmButton = {
-                Text(
-                    text = stringResource(id = R.string.agree),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .clickable { openDialog = false },
-                )
-            },
-        )
     }
 }
 

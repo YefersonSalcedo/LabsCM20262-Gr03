@@ -17,7 +17,6 @@
 package co.edu.udea.compumovil.gr03_20262.lab2.ui.interests
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -58,7 +57,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
@@ -92,16 +90,7 @@ enum class Sections(@StringRes val titleResId: Int) {
     Publications(R.string.interests_section_publications),
 }
 
-/**
- * TabContent for a single tab of the screen.
- *
- * This is intended to encapsulate a tab & it's content as a single object. It was added to avoid
- * passing several parameters per-tab from the stateful composable to the composable that displays
- * the current tab.
- *
- * @param section the tab that this content is for
- * @param section content of the tab, a composable that describes the content
- */
+
 class TabContent(val section: Sections, val content: @Composable () -> Unit)
 
 @Serializable
@@ -129,14 +118,7 @@ fun EntryProviderScope<NavKey>.interestsEntry(
     }
 }
 
-/**
- * Stateful composable that displays the Interests screen.
- *
- * @param interestsViewModel ViewModel that handles the business logic of this screen
- * @param isExpandedScreen (state) true if the screen is expanded
- * @param openDrawer (event) request opening the app drawer
- * @param snackbarHostState (state) state for screen snackbar host
- */
+
 @Composable
 fun InterestsScreen(
     interestsViewModel: InterestsViewModel,
@@ -159,18 +141,7 @@ fun InterestsScreen(
     )
 }
 
-/**
- * Stateless interest screen displays the tabs specified in [tabContent] adapting the UI to
- * different screen sizes.
- *
- * @param tabContent (slot) the tabs and their content to display on this screen, must be a
- * non-empty list, tabs are displayed in the order specified by this list
- * @param currentSection (state) the current tab to display, must be in [tabContent]
- * @param isExpandedScreen (state) true if the screen is expanded
- * @param onTabChange (event) request a change in [currentSection] to another tab from [tabContent]
- * @param openDrawer (event) request opening the app drawer
- * @param snackbarHostState (state) the state for the screen's [Scaffold]
- */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InterestsScreen(
@@ -181,14 +152,13 @@ fun InterestsScreen(
     openDrawer: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    val context = LocalContext.current
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.cd_interests),
+                        text = stringResource(R.string.interests_title),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -205,22 +175,6 @@ fun InterestsScreen(
                         }
                     }
                 },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            Toast.makeText(
-                                context,
-                                "Search is not yet implemented in this configuration",
-                                Toast.LENGTH_LONG,
-                            ).show()
-                        },
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_search),
-                            contentDescription = stringResource(R.string.cd_search),
-                        )
-                    }
-                },
             )
         },
     ) { innerPadding ->
@@ -232,17 +186,13 @@ fun InterestsScreen(
     }
 }
 
-/**
- * Remembers the content for each tab on the Interests screen
- * gathering application data from [InterestsViewModel]
- */
+
 @Composable
 fun rememberTabContent(interestsViewModel: InterestsViewModel): List<TabContent> {
     // UiState of the InterestsScreen
     val uiState by interestsViewModel.uiState.collectAsStateWithLifecycle()
 
-    // Describe the screen sections here since each section needs 2 states and 1 event.
-    // Pass them to the stateless InterestsScreen using a tabContent.
+    // Each tab needs state + event; pass them via TabContent
     val topicsSection = TabContent(Sections.Topics) {
         val selectedTopics by interestsViewModel.selectedTopics.collectAsStateWithLifecycle()
         TabWithSections(
@@ -274,15 +224,7 @@ fun rememberTabContent(interestsViewModel: InterestsViewModel): List<TabContent>
     return listOf(topicsSection, peopleSection, publicationSection)
 }
 
-/**
- * Displays a tab row with [currentSection] selected and the body of the corresponding [tabContent].
- *
- * @param currentSection (state) the tab that is currently selected
- * @param isExpandedScreen (state) whether or not the screen is expanded
- * @param updateSection (event) request a change in tab selection
- * @param tabContent (slot) tabs and their content to display, must be a non-empty list, tabs are
- * displayed in the order of this list
- */
+
 @Composable
 private fun InterestScreenContent(
     currentSection: Sections,
@@ -304,20 +246,12 @@ private fun InterestScreenContent(
     }
 }
 
-/**
- * Modifier for UI containers that show interests items
- */
+
 private val tabContainerModifier = Modifier
     .fillMaxWidth()
     .wrapContentWidth(Alignment.CenterHorizontally)
 
-/**
- * Display a simple list of topics
- *
- * @param topics (state) topics to display
- * @param selectedTopics (state) currently selected topics
- * @param onTopicSelect (event) request a topic selection be changed
- */
+
 @Composable
 private fun TabWithTopics(topics: List<String>, selectedTopics: Set<String>, onTopicSelect: (String) -> Unit) {
     InterestsAdaptiveContentLayout(
@@ -334,13 +268,7 @@ private fun TabWithTopics(topics: List<String>, selectedTopics: Set<String>, onT
     }
 }
 
-/**
- * Display a sectioned list of topics
- *
- * @param sections (state) topics to display, grouped by sections
- * @param selectedTopics (state) currently selected topics
- * @param onTopicSelect (event) request a topic+section selection be changed
- */
+
 @Composable
 private fun TabWithSections(sections: List<InterestSection>, selectedTopics: Set<TopicSelection>, onTopicSelect: (TopicSelection) -> Unit) {
     Column(tabContainerModifier.verticalScroll(rememberScrollState())) {
@@ -365,13 +293,7 @@ private fun TabWithSections(sections: List<InterestSection>, selectedTopics: Set
     }
 }
 
-/**
- * Display a full-width topic item
- *
- * @param itemTitle (state) topic title
- * @param selected (state) is topic currently selected
- * @param onToggle (event) toggle selection for topic
- */
+
 @Composable
 private fun TopicItem(itemTitle: String, selected: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
     Column(Modifier.padding(horizontal = 16.dp)) {
@@ -407,9 +329,7 @@ private fun TopicItem(itemTitle: String, selected: Boolean, onToggle: () -> Unit
     }
 }
 
-/**
- * TabRow for the InterestsScreen
- */
+
 @Composable
 private fun InterestsTabRow(
     selectedTabIndex: Int,
@@ -472,15 +392,7 @@ private fun InterestsTabRowContent(
     }
 }
 
-/**
- * Custom layout for the Interests screen that places items on the screen given the available size.
- *
- * For example: Given a list of items (A, B, C, D, E) and a screen size that allows 2 columns,
- * the items will be displayed on the screen as follows:
- *     A B
- *     C D
- *     E
- */
+
 @Composable
 private fun InterestsAdaptiveContentLayout(
     modifier: Modifier = Modifier,
@@ -497,8 +409,7 @@ private fun InterestsAdaptiveContentLayout(
         val itemSpacingPx = itemSpacing.roundToPx()
         val itemMaxWidthPx = itemMaxWidth.roundToPx()
 
-        // Number of columns to display on the screen. This is harcoded to 2 due to
-        // the design mocks, but this logic could change in the future.
+        // Hardcoded to 2 columns for the current design
         val columns = if (outerConstraints.maxWidth < multipleColumnsBreakPointPx) 1 else 2
         // Max width for each item taking into account available space, spacing and `itemMaxWidth`
         val itemWidth = if (columns == 1) {

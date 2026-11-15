@@ -36,7 +36,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,16 +46,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,9 +81,7 @@ import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.DeepLinkKey
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.ListDetailScene
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.theme.JetnewsTheme
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.utils.BookmarkButton
-import co.edu.udea.compumovil.gr03_20262.lab2.ui.utils.FavoriteButton
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.utils.ShareButton
-import co.edu.udea.compumovil.gr03_20262.lab2.ui.utils.TextSettingsButton
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -173,24 +166,14 @@ fun PostScreen(
         } else {
             Surface(modifier = Modifier.fillMaxSize()) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(text = "Post not found")
+                    Text(text = stringResource(R.string.post_not_found))
                 }
             }
         }
     }
 }
 
-/**
- * Stateless Post Screen that displays a single post adapting the UI to different screen sizes.
- *
- * @param post (state) item to display
- * @param isExpandedScreen (state) whether the screen is expanded
- * @param onBack (event) request navigate back
- * @param isFavorite (state) is this item currently a favorite
- * @param onToggleFavorite (event) request that this post toggle its favorite state
- * @param modifier modifier for the root element
- * @param lazyListState (state) the [LazyListState] for the post content
- */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
@@ -202,11 +185,6 @@ fun PostScreen(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    var showUnimplementedActionDialog by rememberSaveable { mutableStateOf(false) }
-    if (showUnimplementedActionDialog) {
-        FunctionalityNotAvailablePopup { showUnimplementedActionDialog = false }
-    }
-
     val context = LocalContext.current
     Box(modifier) {
         PostScreenContent(
@@ -228,14 +206,8 @@ fun PostScreen(
                 if (!isExpandedScreen) {
                     BottomAppBar(
                         actions = {
-                            FavoriteButton(onClick = { showUnimplementedActionDialog = true })
                             BookmarkButton(isBookmarked = isFavorite, onClick = onToggleFavorite)
                             ShareButton(onClick = { sharePost(post, context) })
-                            TextSettingsButton(
-                                onClick = {
-                                    showUnimplementedActionDialog = true
-                                },
-                            )
                         },
                     )
                 }
@@ -259,15 +231,7 @@ fun PostScreen(
     }
 }
 
-/**
- * Stateless Post Screen that displays a single post.
- *
- * @param post (state) item to display
- * @param navigationIconContent (UI) content to show for the navigation icon
- * @param bottomBarContent (UI) content to show for the bottom bar
- * @param lazyListState (state) the [LazyListState] for the post content
- * @param showTopAppBar (state) if the top app bar should be shown
- */
+
 @ExperimentalMaterial3Api
 @Composable
 private fun PostScreenContent(
@@ -334,14 +298,7 @@ private fun TopAppBar(
     )
 }
 
-/**
- * Top bar for a Post when displayed next to the Home feed
- *
- * @param isFavorite (state) is this item currently a favorite
- * @param onToggleFavorite (event) request that this post toggle its favorite state
- * @param onSharePost (event) request sharing the post
- * @param modifier modifier for the root element
- */
+
 @Composable
 private fun PostTopBar(isFavorite: Boolean, onToggleFavorite: () -> Unit, onSharePost: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
@@ -350,43 +307,13 @@ private fun PostTopBar(isFavorite: Boolean, onToggleFavorite: () -> Unit, onShar
         modifier = modifier.padding(end = 16.dp),
     ) {
         Row(Modifier.padding(horizontal = 8.dp)) {
-            FavoriteButton(onClick = { /* Functionality not available */ })
             BookmarkButton(isBookmarked = isFavorite, onClick = onToggleFavorite)
             ShareButton(onClick = onSharePost)
-            TextSettingsButton(onClick = { /* Functionality not available */ })
         }
     }
 }
 
-/**
- * Display a popup explaining functionality not available.
- *
- * @param onDismiss (event) request the popup be dismissed
- */
-@Composable
-private fun FunctionalityNotAvailablePopup(onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        text = {
-            Text(
-                text = stringResource(id = R.string.post_functionality_not_available),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.close))
-            }
-        },
-    )
-}
 
-/**
- * Show a share sheet for a post
- *
- * @param post to share
- * @param context Android context to show the share sheet in
- */
 fun sharePost(post: Post, context: Context) {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"

@@ -19,26 +19,21 @@ package co.edu.udea.compumovil.gr03_20262.lab2.data
 import android.content.Context
 import co.edu.udea.compumovil.gr03_20262.lab2.data.interests.InterestsRepository
 import co.edu.udea.compumovil.gr03_20262.lab2.data.interests.impl.FakeInterestsRepository
+import co.edu.udea.compumovil.gr03_20262.lab2.data.local.FavoritesStore
 import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.PostsRepository
 import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.impl.FakePostsRepository
 
-/**
- * Dependency Injection container at the application level.
- */
+
 interface AppContainer {
     val postsRepository: PostsRepository
     val interestsRepository: InterestsRepository
 }
 
-/**
- * Implementation for the Dependency Injection container at the application level.
- *
- * Variables are initialized lazily and the same instance is shared across the whole app.
- */
+
 class AppContainerImpl(private val applicationContext: Context) : AppContainer {
 
     override val postsRepository: PostsRepository by lazy {
-        FakePostsRepository()
+        FakePostsRepository(FavoritesStore(applicationContext))
     }
 
     override val interestsRepository: InterestsRepository by lazy {

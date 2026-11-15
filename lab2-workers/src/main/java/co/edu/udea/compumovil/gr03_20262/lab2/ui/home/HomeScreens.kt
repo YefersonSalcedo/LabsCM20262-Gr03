@@ -16,9 +16,7 @@
 
 package co.edu.udea.compumovil.gr03_20262.lab2.ui.home
 
-import android.content.Context
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -39,8 +37,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,7 +44,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -63,32 +58,36 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import co.edu.udea.compumovil.gr03_20262.lab2.R
 import co.edu.udea.compumovil.gr03_20262.lab2.data.Result
 import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.PostsRepository
@@ -97,9 +96,11 @@ import co.edu.udea.compumovil.gr03_20262.lab2.deeplink.util.DeepLinkPattern
 import co.edu.udea.compumovil.gr03_20262.lab2.model.Post
 import co.edu.udea.compumovil.gr03_20262.lab2.model.PostsFeed
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.components.JetnewsSnackbarHost
-import co.edu.udea.compumovil.gr03_20262.lab2.ui.modifiers.interceptKey
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.ListDetailScene
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.theme.JetnewsTheme
+import co.edu.udea.compumovil.gr03_20262.lab2.work.SyncScheduler
+import java.util.UUID
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 
@@ -146,17 +147,7 @@ fun EntryProviderScope<NavKey>.homeEntry(
     }
 }
 
-/**
- * Displays the Home screen.
- *
- * Note: AAC ViewModels don't work with Compose Previews currently.
- *
- * @param homeViewModel ViewModel that handles the business logic of this screen
- * @param isExpandedScreen (state) whether the screen is expanded
- * @param openDrawer (event) request opening the app drawer
- * @param navigateToPost (event) request navigation to Post screen
- * @param snackbarHostState (state) state for the [Scaffold] component on this screen
- */
+
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel,
@@ -167,6 +158,34 @@ fun HomeScreen(
 ) {
     // UiState of the HomeScreen
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val snackbarScope = rememberCoroutineScope()
+    var syncWorkId by remember { mutableStateOf<UUID?>(null) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner, homeViewModel) {
+        var hasResumed = false
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (hasResumed) {
+                    homeViewModel.refreshPosts()
+                } else {
+                    hasResumed = true
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    LaunchedEffect(syncWorkId) {
+        val workId = syncWorkId ?: return@LaunchedEffect
+        WorkManager.getInstance(context).getWorkInfoByIdFlow(workId).collect { workInfo ->
+            if (workInfo?.state == WorkInfo.State.SUCCEEDED) {
+                homeViewModel.refreshPosts()
+            }
+        }
+    }
 
     HomeFeedScreen(
         uiState = uiState,
@@ -174,18 +193,20 @@ fun HomeScreen(
         onToggleFavorite = { homeViewModel.toggleFavourite(it) },
         onSelectPost = { navigateToPost(it) },
         onRefreshPosts = { homeViewModel.refreshPosts() },
+        onSyncNow = {
+            syncWorkId = SyncScheduler.syncNow(context)
+            snackbarScope.launch {
+                snackbarHostState.showSnackbar(context.getString(R.string.sync_started))
+            }
+        },
         onErrorDismiss = { homeViewModel.errorShown(it) },
         openDrawer = openDrawer,
         homeListLazyListState = rememberLazyListState(),
         snackbarHostState = snackbarHostState,
-        onSearchInputChanged = { homeViewModel.onSearchInputChanged(it) },
-        searchInput = uiState.searchInput,
     )
 }
 
-/**
- * The home screen displaying just the post feed.
- */
+
 @Composable
 fun HomeFeedScreen(
     uiState: HomeUiState,
@@ -193,18 +214,18 @@ fun HomeFeedScreen(
     onToggleFavorite: (String) -> Unit,
     onSelectPost: (String) -> Unit,
     onRefreshPosts: () -> Unit,
+    onSyncNow: () -> Unit = {},
     onErrorDismiss: (Long) -> Unit,
     openDrawer: () -> Unit,
     homeListLazyListState: LazyListState,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    searchInput: String = "",
-    onSearchInputChanged: (String) -> Unit,
 ) {
     HomeScreenWithList(
         uiState = uiState,
         showTopAppBar = showTopAppBar,
         onRefreshPosts = onRefreshPosts,
+        onSyncNow = onSyncNow,
         onErrorDismiss = onErrorDismiss,
         openDrawer = openDrawer,
         snackbarHostState = snackbarHostState,
@@ -213,30 +234,23 @@ fun HomeFeedScreen(
         PostList(
             postsFeed = hasPostsUiState.postsFeed,
             favorites = hasPostsUiState.favorites,
-            showExpandedSearch = !showTopAppBar,
             onPostTapped = onSelectPost,
             onToggleFavorite = onToggleFavorite,
             contentPadding = contentPadding,
             modifier = contentModifier,
             state = homeListLazyListState,
-            searchInput = searchInput,
-            onSearchInputChanged = onSearchInputChanged,
         )
     }
 }
 
-/**
- * A display of the home screen that has the list.
- *
- * This sets up the scaffold with the top app bar, and surrounds the [hasPostsContent] with refresh,
- * loading and error handling.
- */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreenWithList(
     uiState: HomeUiState,
     showTopAppBar: Boolean,
     onRefreshPosts: () -> Unit,
+    onSyncNow: () -> Unit,
     onErrorDismiss: (Long) -> Unit,
     openDrawer: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -255,7 +269,9 @@ private fun HomeScreenWithList(
             if (showTopAppBar) {
                 HomeTopAppBar(
                     openDrawer = openDrawer,
+                    onSyncNow = onSyncNow,
                     topAppBarState = topAppBarState,
+                    scrollBehavior = scrollBehavior,
                 )
             }
         },
@@ -314,14 +330,11 @@ private fun HomeScreenWithList(
         val errorMessageText: String = stringResource(errorMessage.messageId)
         val retryMessageText = stringResource(id = R.string.retry)
 
-        // If onRefreshPosts or onErrorDismiss change while the LaunchedEffect is running,
-        // don't restart the effect and use the latest lambda values.
+        // Use latest callbacks without restarting the effect
         val onRefreshPostsState by rememberUpdatedState(onRefreshPosts)
         val onErrorDismissState by rememberUpdatedState(onErrorDismiss)
 
-        // Effect running in a coroutine that displays the Snackbar on the screen
-        // If there's a change to errorMessageText, retryMessageText or snackbarHostState,
-        // the previous effect will be cancelled and a new one will start with the new values
+        // Show one snackbar at a time; restart if inputs change
         LaunchedEffect(errorMessageText, retryMessageText, snackbarHostState) {
             val snackbarResult = snackbarHostState.showSnackbar(
                 message = errorMessageText,
@@ -336,15 +349,7 @@ private fun HomeScreenWithList(
     }
 }
 
-/**
- * Display an initial empty state or swipe to refresh content.
- *
- * @param empty (state) when true, display [emptyContent]
- * @param emptyContent (slot) the content to display for the empty state
- * @param loading (state) when true, display a loading spinner over [content]
- * @param onRefresh (event) event to request refresh
- * @param content (slot) the main content to show
- */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoadingContent(
@@ -377,49 +382,22 @@ private fun LoadingContent(
     }
 }
 
-/**
- * Display a feed of posts.
- *
- * When a post is clicked on, [onPostTapped] will be called.
- *
- * @param postsFeed (state) the feed to display
- * @param favorites (state) a set of favorite posts
- * @param showExpandedSearch (state) whether the expanded search is shown
- * @param onPostTapped (event) request navigation to Post screen
- * @param onToggleFavorite (event) request that this post toggle its favorite state
- * @param modifier modifier for the root element
- * @param contentPadding the padding to apply to the content
- * @param state the state object to be used to control or observe the list's state
- * @param searchInput (state) the search input
- * @param onSearchInputChanged (event) request that the search input changed
- */
+
 @Composable
 private fun PostList(
     postsFeed: PostsFeed,
     favorites: Set<String>,
-    showExpandedSearch: Boolean,
     onPostTapped: (postId: String) -> Unit,
     onToggleFavorite: (String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     state: LazyListState = rememberLazyListState(),
-    searchInput: String = "",
-    onSearchInputChanged: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
         contentPadding = contentPadding,
         state = state,
     ) {
-        if (showExpandedSearch) {
-            item {
-                HomeSearch(
-                    Modifier.padding(horizontal = 16.dp),
-                    searchInput = searchInput,
-                    onSearchInputChanged = onSearchInputChanged,
-                )
-            }
-        }
         item { PostListTopSection(postsFeed.highlightedPost, onPostTapped) }
         if (postsFeed.recommendedPosts.isNotEmpty()) {
             item {
@@ -431,7 +409,7 @@ private fun PostList(
                 )
             }
         }
-        if (postsFeed.popularPosts.isNotEmpty() && !showExpandedSearch) {
+        if (postsFeed.popularPosts.isNotEmpty()) {
             item {
                 PostListPopularSection(
                     postsFeed.popularPosts, onPostTapped,
@@ -444,9 +422,7 @@ private fun PostList(
     }
 }
 
-/**
- * Full screen circular progress indicator
- */
+
 @Composable
 private fun FullScreenLoading() {
     Box(
@@ -458,12 +434,7 @@ private fun FullScreenLoading() {
     }
 }
 
-/**
- * Top section of [PostList]
- *
- * @param post (state) highlighted post to display
- * @param navigateToPost (event) request navigation to Post screen
- */
+
 @Composable
 private fun PostListTopSection(post: Post, navigateToPost: (String) -> Unit) {
     Text(
@@ -478,14 +449,7 @@ private fun PostListTopSection(post: Post, navigateToPost: (String) -> Unit) {
     PostListDivider()
 }
 
-/**
- * Full-width list items for [PostList]
- *
- * @param posts (state) to display
- * @param navigateToPost (event) request navigation to Post screen
- * @param favorites (state) a set of favorite posts
- * @param onToggleFavorite (event) request that this post toggle its favorite state
- */
+
 @Composable
 private fun PostListSimpleSection(
     posts: List<Post>,
@@ -506,12 +470,7 @@ private fun PostListSimpleSection(
     }
 }
 
-/**
- * Horizontal scrolling cards for [PostList]
- *
- * @param posts (state) to display
- * @param navigateToPost (event) request navigation to Post screen
- */
+
 @Composable
 private fun PostListPopularSection(posts: List<Post>, navigateToPost: (String) -> Unit) {
     Column {
@@ -539,12 +498,7 @@ private fun PostListPopularSection(posts: List<Post>, navigateToPost: (String) -
     }
 }
 
-/**
- * Full-width list items that display "based on your history" for [PostList]
- *
- * @param posts (state) to display
- * @param navigateToPost (event) request navigation to Post screen
- */
+
 @Composable
 private fun PostListHistorySection(posts: List<Post>, navigateToPost: (String) -> Unit) {
     Column {
@@ -555,9 +509,7 @@ private fun PostListHistorySection(posts: List<Post>, navigateToPost: (String) -
     }
 }
 
-/**
- * Full-width divider with padding for [PostList]
- */
+
 @Composable
 private fun PostListDivider() {
     HorizontalDivider(
@@ -566,66 +518,17 @@ private fun PostListDivider() {
     )
 }
 
-/**
- * Expanded search UI - includes support for enter-to-send on the search field
- */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
-@Composable
-private fun HomeSearch(modifier: Modifier = Modifier, searchInput: String = "", onSearchInputChanged: (String) -> Unit) {
-    val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-    OutlinedTextField(
-        value = searchInput,
-        onValueChange = onSearchInputChanged,
-        placeholder = { Text(stringResource(R.string.home_search)) },
-        leadingIcon = { Icon(painter = painterResource(R.drawable.ic_search), contentDescription = null) },
-        modifier = modifier
-            .fillMaxWidth()
-            .interceptKey(Key.Enter) {
-                // submit a search query when Enter is pressed
-                submitSearch(onSearchInputChanged, context)
-                keyboardController?.hide()
-                focusManager.clearFocus(force = true)
-            },
-        singleLine = true,
-        // keyboardOptions change the newline key to a search key on the soft keyboard
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        // keyboardActions submits the search query when the search key is pressed
-        keyboardActions = KeyboardActions(
-            onSearch = {
-                submitSearch(onSearchInputChanged, context)
-                keyboardController?.hide()
-            },
-        ),
-    )
-}
 
-/**
- * Stub helper function to submit a user's search query
- */
-private fun submitSearch(onSearchInputChanged: (String) -> Unit, context: Context) {
-    onSearchInputChanged("")
-    Toast.makeText(
-        context,
-        "Search is not yet implemented",
-        Toast.LENGTH_SHORT,
-    ).show()
-}
-
-/**
- * TopAppBar for the Home screen
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeTopAppBar(
     openDrawer: () -> Unit,
+    onSyncNow: () -> Unit,
     modifier: Modifier = Modifier,
     topAppBarState: TopAppBarState = rememberTopAppBarState(),
     scrollBehavior: TopAppBarScrollBehavior? =
         TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState),
 ) {
-    val context = LocalContext.current
     val title = stringResource(id = R.string.app_name)
     CenterAlignedTopAppBar(
         title = {
@@ -646,16 +549,10 @@ private fun HomeTopAppBar(
             }
         },
         actions = {
-            IconButton(onClick = {
-                Toast.makeText(
-                    context,
-                    "Search is not yet implemented in this configuration",
-                    Toast.LENGTH_LONG,
-                ).show()
-            }) {
+            IconButton(onClick = onSyncNow) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_search),
-                    contentDescription = stringResource(R.string.cd_search),
+                    painter = painterResource(R.drawable.ic_refresh),
+                    contentDescription = stringResource(R.string.cd_sync_now),
                 )
             }
         },
@@ -679,7 +576,6 @@ fun PreviewHomeListDrawerScreen() {
                 favorites = emptySet(),
                 isLoading = false,
                 errorMessages = emptyList(),
-                searchInput = "",
             ),
             showTopAppBar = false,
             onToggleFavorite = {},
@@ -689,7 +585,6 @@ fun PreviewHomeListDrawerScreen() {
             openDrawer = {},
             homeListLazyListState = rememberLazyListState(),
             snackbarHostState = SnackbarHostState(),
-            onSearchInputChanged = {},
         )
     }
 }
@@ -713,7 +608,6 @@ fun PreviewHomeListNavRailScreen() {
                 favorites = emptySet(),
                 isLoading = false,
                 errorMessages = emptyList(),
-                searchInput = "",
             ),
             showTopAppBar = true,
             onToggleFavorite = {},
@@ -723,7 +617,6 @@ fun PreviewHomeListNavRailScreen() {
             openDrawer = {},
             homeListLazyListState = rememberLazyListState(),
             snackbarHostState = SnackbarHostState(),
-            onSearchInputChanged = {},
         )
     }
 }

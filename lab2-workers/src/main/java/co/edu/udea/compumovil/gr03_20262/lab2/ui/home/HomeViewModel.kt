@@ -32,59 +32,38 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/**
- * UI state for the Home screen.
- *
- * This is derived from [HomeViewModelState], but split into two possible subclasses to more
- * precisely represent the state available to render the UI.
- */
+
 sealed interface HomeUiState {
 
     val isLoading: Boolean
     val errorMessages: List<ErrorMessage>
-    val searchInput: String
 
-    /**
-     * There are no posts to render.
-     *
-     * This could either be because they are still loading or they failed to load, and we are
-     * waiting to reload them.
-     */
-    data class NoPosts(override val isLoading: Boolean, override val errorMessages: List<ErrorMessage>, override val searchInput: String) :
+    
+    data class NoPosts(override val isLoading: Boolean, override val errorMessages: List<ErrorMessage>) :
         HomeUiState
 
-    /**
-     * There are posts to render, as contained in [postsFeed].
-     */
+    
     data class HasPosts(
         val postsFeed: PostsFeed,
         val favorites: Set<String>,
         override val isLoading: Boolean,
         override val errorMessages: List<ErrorMessage>,
-        override val searchInput: String,
     ) : HomeUiState
 }
 
-/**
- * An internal representation of the Home screen state, in a raw form
- */
+
 private data class HomeViewModelState(
     val postsFeed: PostsFeed? = null,
     val favorites: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val errorMessages: List<ErrorMessage> = emptyList(),
-    val searchInput: String = "",
 ) {
 
-    /**
-     * Converts this [HomeViewModelState] into a more strongly typed [HomeUiState] for driving
-     * the ui.
-     */
+    
     fun toUiState(): HomeUiState = if (postsFeed == null) {
         HomeUiState.NoPosts(
             isLoading = isLoading,
             errorMessages = errorMessages,
-            searchInput = searchInput,
         )
     } else {
         HomeUiState.HasPosts(
@@ -92,14 +71,11 @@ private data class HomeViewModelState(
             favorites = favorites,
             isLoading = isLoading,
             errorMessages = errorMessages,
-            searchInput = searchInput,
         )
     }
 }
 
-/**
- * ViewModel that handles the business logic of the Home screen
- */
+
 class HomeViewModel(private val postsRepository: PostsRepository) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(
@@ -126,11 +102,18 @@ class HomeViewModel(private val postsRepository: PostsRepository) : ViewModel() 
                 viewModelState.update { it.copy(favorites = favorites) }
             }
         }
+
+        // Observe feed updates coming from sync or repository refreshes
+        viewModelScope.launch {
+            postsRepository.observePostsFeed().collect { postsFeed ->
+                if (postsFeed != null) {
+                    viewModelState.update { it.copy(postsFeed = postsFeed, isLoading = false) }
+                }
+            }
+        }
     }
 
-    /**
-     * Refresh posts and update the UI state accordingly
-     */
+    
     fun refreshPosts() {
         // Ui state is refreshing
         viewModelState.update { it.copy(isLoading = true) }
@@ -153,18 +136,14 @@ class HomeViewModel(private val postsRepository: PostsRepository) : ViewModel() 
         }
     }
 
-    /**
-     * Toggle favorite of a post
-     */
+    
     fun toggleFavourite(postId: String) {
         viewModelScope.launch {
             postsRepository.toggleFavorite(postId)
         }
     }
 
-    /**
-     * Notify that an error was displayed on the screen
-     */
+    
     fun errorShown(errorId: Long) {
         viewModelState.update { currentUiState ->
             val errorMessages = currentUiState.errorMessages.filterNot { it.id == errorId }
@@ -172,18 +151,8 @@ class HomeViewModel(private val postsRepository: PostsRepository) : ViewModel() 
         }
     }
 
-    /**
-     * Notify that the user updated the search query
-     */
-    fun onSearchInputChanged(searchInput: String) {
-        viewModelState.update {
-            it.copy(searchInput = searchInput)
-        }
-    }
 
-    /**
-     * Factory for HomeViewModel that takes PostsRepository as a dependency
-     */
+    
     companion object {
         fun provideFactory(postsRepository: PostsRepository): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
