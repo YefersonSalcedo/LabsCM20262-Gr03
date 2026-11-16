@@ -19,9 +19,13 @@ package co.edu.udea.compumovil.gr03_20262.lab2.data
 import android.content.Context
 import co.edu.udea.compumovil.gr03_20262.lab2.data.interests.InterestsRepository
 import co.edu.udea.compumovil.gr03_20262.lab2.data.interests.impl.FakeInterestsRepository
+import co.edu.udea.compumovil.gr03_20262.lab2.data.local.AppDatabase
 import co.edu.udea.compumovil.gr03_20262.lab2.data.local.FavoritesStore
 import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.PostsRepository
-import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.impl.FakePostsRepository
+import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.impl.RealPostsRepository
+import co.edu.udea.compumovil.gr03_20262.lab2.data.remote.NewsApiService
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 interface AppContainer {
@@ -32,8 +36,23 @@ interface AppContainer {
 
 class AppContainerImpl(private val applicationContext: Context) : AppContainer {
 
+    private val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(NewsApiService.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    private val newsApiService: NewsApiService by lazy {
+        retrofit.create(NewsApiService::class.java)
+    }
+
+    private val database: AppDatabase by lazy {
+        AppDatabase.get(applicationContext)
+    }
+
     override val postsRepository: PostsRepository by lazy {
-        FakePostsRepository(FavoritesStore(applicationContext), applicationContext)
+        RealPostsRepository(newsApiService, database, FavoritesStore(applicationContext), applicationContext)
     }
 
     override val interestsRepository: InterestsRepository by lazy {

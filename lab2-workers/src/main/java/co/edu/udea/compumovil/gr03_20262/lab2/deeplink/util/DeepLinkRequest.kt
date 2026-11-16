@@ -38,5 +38,4 @@ internal class DeepLinkRequest(val uri: Uri) {
         }
     }
 
-    // TODO add parsing for other Uri components, i.e. fragments, mimeType, action
 }

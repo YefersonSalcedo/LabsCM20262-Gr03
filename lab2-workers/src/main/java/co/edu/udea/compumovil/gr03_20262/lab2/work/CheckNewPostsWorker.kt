@@ -38,6 +38,6 @@ class CheckNewPostsWorker(
     }
 
     companion object {
-        var checker: NewsChecker = FakeNewsChecker
+        var checker: NewsChecker = RealNewsChecker()
     }
 }

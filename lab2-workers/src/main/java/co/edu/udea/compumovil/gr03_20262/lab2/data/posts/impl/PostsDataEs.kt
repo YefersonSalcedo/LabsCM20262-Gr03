@@ -23,6 +23,7 @@ import co.edu.udea.compumovil.gr03_20262.lab2.model.Metadata
 import co.edu.udea.compumovil.gr03_20262.lab2.model.Paragraph
 import co.edu.udea.compumovil.gr03_20262.lab2.model.ParagraphType
 import co.edu.udea.compumovil.gr03_20262.lab2.model.Post
+import co.edu.udea.compumovil.gr03_20262.lab2.model.PostsFeed
 
 /**
  * Spanish version of the hardcoded posts, used when the app language is Spanish.
@@ -334,3 +335,17 @@ val post3Es = Post(
     imageId = R.drawable.post_3,
     imageThumbId = R.drawable.post_3_thumb,
 )
+
+val postsEs: PostsFeed =
+    PostsFeed(
+        highlightedPost = post3Es,
+        recommendedPosts = listOf(post1Es, post2Es, post3Es),
+        popularPosts = listOf(
+            post1Es,
+            post2Es,
+        ),
+        recentPosts = listOf(
+            post3Es,
+            post1Es,
+        ),
+    )

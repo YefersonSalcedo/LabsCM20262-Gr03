@@ -59,7 +59,6 @@ class DeepLinkPattern<T : NavKey>(val serializer: KSerializer<T>, val uriPattern
      */
     private val regexPatternFillIn = Regex("\\{(.+?)\\}")
 
-    // TODO make these lazy
     /**
      * parse the path into a list of [PathSegment]
      *
