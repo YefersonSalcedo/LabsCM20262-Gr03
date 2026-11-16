@@ -63,6 +63,7 @@ fun PostImage(post: Post, modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(post.imageThumbId),
         contentDescription = null, // decorative
+        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
         modifier = modifier
             .size(40.dp, 40.dp)
             .clip(MaterialTheme.shapes.small),

@@ -181,10 +181,13 @@ class RealPostsRepository(
                     postsFeed.update { feed }
                     try {
                         articleDao.replaceAll(remoteDtos.map { it.toEntity() })
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        if (e is kotlinx.coroutines.CancellationException) throw e
+                    }
                     return@withContext Result.Success(feed)
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 // Fallthrough to Room
             }
 
@@ -203,7 +206,8 @@ class RealPostsRepository(
                     postsFeed.update { feed }
                     return@withContext Result.Success(feed)
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 // Fallthrough to FakePostsRepository backup
             }
 

@@ -16,7 +16,13 @@ class CheckNewPostsWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            val count = checker.refreshAndCountNew()
+            val currentChecker = checker
+            val checkerToUse = if (currentChecker is RealNewsChecker) {
+                RealNewsChecker(applicationContext)
+            } else {
+                currentChecker
+            }
+            val count = checkerToUse.refreshAndCountNew()
             if (count > 0) {
                 val notifyWorkRequest = OneTimeWorkRequestBuilder<NotifyWorker>()
                     .setInputData(workDataOf("count" to count))

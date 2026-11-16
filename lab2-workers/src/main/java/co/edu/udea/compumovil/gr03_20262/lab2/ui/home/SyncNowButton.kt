@@ -11,8 +11,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import co.edu.udea.compumovil.gr03_20262.lab2.R
@@ -71,28 +76,48 @@ fun SyncNowButton(
         }
     }
 
+    val syncText = stringResource(
+        if (requestId == null) {
+            R.string.sync_now
+        } else {
+            R.string.sync_in_progress
+        },
+    )
+
     TextButton(
         enabled = requestId == null,
         onClick = {
-            requestId = SyncScheduler
-                .syncNow(appContext)
-                .toString()
+            if (!isNetworkConnected(context)) {
+                Toast.makeText(
+                    context,
+                    R.string.sync_failed,
+                    Toast.LENGTH_SHORT,
+                ).show()
+            } else {
+                requestId = SyncScheduler
+                    .syncNow(appContext)
+                    .toString()
 
-            Toast.makeText(
-                context,
-                R.string.sync_started,
-                Toast.LENGTH_SHORT,
-            ).show()
+                Toast.makeText(
+                    context,
+                    R.string.sync_started,
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+        },
+        modifier = Modifier.semantics {
+            contentDescription = syncText
         },
     ) {
         Text(
-            text = stringResource(
-                if (requestId == null) {
-                    R.string.sync_now
-                } else {
-                    R.string.sync_in_progress
-                },
-            ),
+            text = syncText,
         )
     }
+}
+
+private fun isNetworkConnected(context: android.content.Context): Boolean {
+    val connectivityManager = context.getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+    return capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
 }
