@@ -60,4 +60,13 @@
     <string name="sync_completed">Synchronization completed</string>
     <string name="sync_failed">Could not synchronize</string>
 
+    <!-- Language selector -->
+    <string name="language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_auto">Auto</string>
+    <string name="language_english_short">EN</string>
+    <string name="language_spanish_short">ES</string>
+
 </resources>

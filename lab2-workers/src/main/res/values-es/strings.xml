@@ -46,4 +46,13 @@
     <string name="sync_started">Sincronización iniciada</string>
     <string name="sync_completed">Sincronización completada</string>
     <string name="sync_failed">No se pudo sincronizar</string>
+
+    <!-- Language selector -->
+    <string name="language">Idioma</string>
+    <string name="language_system">Predeterminado del sistema</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_auto">Automático</string>
+    <string name="language_english_short">EN</string>
+    <string name="language_spanish_short">ES</string>
 </resources>

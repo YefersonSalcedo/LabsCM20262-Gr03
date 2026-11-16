@@ -16,8 +16,10 @@
 
 package co.edu.udea.compumovil.gr03_20262.lab2.data.posts.impl
 
+import android.content.Context
 import co.edu.udea.compumovil.gr03_20262.lab2.data.Result
 import co.edu.udea.compumovil.gr03_20262.lab2.data.local.FavoritesStore
+import co.edu.udea.compumovil.gr03_20262.lab2.data.local.LanguageStore
 import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.PostsRepository
 import co.edu.udea.compumovil.gr03_20262.lab2.model.Post
 import co.edu.udea.compumovil.gr03_20262.lab2.model.PostsFeed
@@ -29,13 +31,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 
 
-class FakePostsRepository(private val favoritesStore: FavoritesStore) : PostsRepository {
+class FakePostsRepository(
+    private val favoritesStore: FavoritesStore,
+    private val context: Context,
+) : PostsRepository {
 
     private val postsFeed = MutableStateFlow<PostsFeed?>(null)
 
+    private fun currentPosts(): PostsFeed =
+        if (LanguageStore.getEffectiveLanguage(context).startsWith("es")) postsEs else posts
+
     override suspend fun getPost(postId: String?): Result<Post> {
         return withContext(Dispatchers.IO) {
-            val post = posts.allPosts.find { it.id == postId }
+            val post = currentPosts().allPosts.find { it.id == postId }
             if (post == null) {
                 Result.Error(IllegalArgumentException("Post not found"))
             } else {
@@ -50,8 +58,8 @@ class FakePostsRepository(private val favoritesStore: FavoritesStore) : PostsRep
             if (shouldRandomlyFail()) {
                 Result.Error(IllegalStateException())
             } else {
-                postsFeed.update { posts }
-                Result.Success(posts)
+                postsFeed.update { currentPosts() }
+                Result.Success(currentPosts())
             }
         }
     }
@@ -61,6 +69,10 @@ class FakePostsRepository(private val favoritesStore: FavoritesStore) : PostsRep
 
     override suspend fun toggleFavorite(postId: String) {
         favoritesStore.toggle(postId)
+    }
+
+    override suspend fun refreshFeed() {
+        postsFeed.update { currentPosts() }
     }
 
     // deterministic failure every 5 requests so the first request succeeds

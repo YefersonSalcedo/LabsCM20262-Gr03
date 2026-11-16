@@ -17,6 +17,7 @@
 package co.edu.udea.compumovil.gr03_20262.lab2.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -31,12 +32,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import co.edu.udea.compumovil.gr03_20262.lab2.JetnewsApplication
+import co.edu.udea.compumovil.gr03_20262.lab2.data.local.LanguageStore
 import co.edu.udea.compumovil.gr03_20262.lab2.deeplink.handleDeepLink
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.home.HomeKey
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.rememberInitialBackStack
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.utils.NewIntentEffect
 
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LanguageStore.applyLocale(newBase))
+    }
+
     private val notificationPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission(),
