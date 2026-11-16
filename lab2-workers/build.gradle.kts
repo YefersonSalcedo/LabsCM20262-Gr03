@@ -97,7 +97,8 @@ dependencies {
 
     // Lab 2: REST + Worker
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.moshi.kotlin)
     implementation(libs.androidx.work.runtime.ktx)
 
     // Room

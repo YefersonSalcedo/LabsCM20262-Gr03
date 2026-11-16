@@ -24,8 +24,10 @@ import co.edu.udea.compumovil.gr03_20262.lab2.data.local.FavoritesStore
 import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.PostsRepository
 import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.impl.RealPostsRepository
 import co.edu.udea.compumovil.gr03_20262.lab2.data.remote.NewsApiService
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 
 
 interface AppContainer {
@@ -36,10 +38,16 @@ interface AppContainer {
 
 class AppContainerImpl(private val applicationContext: Context) : AppContainer {
 
+    private val moshi: Moshi by lazy {
+        Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+    }
+
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(NewsApiService.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }
 
