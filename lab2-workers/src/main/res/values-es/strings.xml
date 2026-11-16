@@ -1,69 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Jetnews</string>
-
     <string name="load_error">No se pudieron actualizar las noticias</string>
     <string name="retry">Reintentar</string>
-
-    <string name="cd_add_to_favorites">Agregar a favoritos</string>
     <string name="cd_share">Compartir</string>
-    <string name="cd_text_settings">Configuración del texto</string>
     <string name="cd_open_navigation_drawer">Abrir menú de navegación</string>
-    <string name="cd_more_actions">Más opciones</string>
-    <string name="unbookmark">Quitar de favoritos</string>
-    <string name="bookmark">Agregar a favoritos</string>
-    <string name="cd_search">Buscar</string>
+    <string name="unbookmark">Quitar marcador</string>
+    <string name="bookmark">Guardar marcador</string>
+    <string name="cd_navigate_up">Volver</string>
+    <string name="cd_navigate_home">Ir a la pantalla de inicio</string>
+    <string name="cd_navigate_interests">Ir a la pantalla de intereses</string>
     <string name="cd_interests">Intereses</string>
-
     <string name="published_in">Publicado en: \n%1$s</string>
-    <string name="fewer_stories">¿Mostrar menos noticias como esta?</string>
-    <string name="fewer_stories_content">Esta función todavía no está implementada</string>
-    <string name="agree">Aceptar</string>
-    <string name="close">Cerrar</string>
 
-    <!-- Pantalla principal -->
+    <!-- Home Screen -->
     <string name="home_title">Inicio</string>
     <string name="home_tap_to_load_content">Toca para cargar el contenido</string>
-    <string name="home_top_section_title">Noticias destacadas para ti</string>
-    <string name="home_popular_section_title">Popular en Jetnews</string>
+    <string name="home_top_section_title">Historias principales para ti</string>
+    <string name="home_popular_section_title">Populares en Jetnews</string>
     <string name="home_post_min_read">%1$s - %2$d min de lectura</string>
-    <string name="home_post_based_on_history">SEGÚN TU HISTORIAL</string>
-    <string name="home_search">Buscar artículos</string>
-    <string name="home_detail_placeholder">Selecciona un artículo</string>
+    <string name="home_post_based_on_history">BASADO EN TU HISTORIAL</string>
+    <string name="home_detail_placeholder">Selecciona una publicación</string>
 
-    <!-- Detalle del artículo -->
-    <string name="post_functionality_not_available">Función no disponible 🙈</string>
-    <string name="post_share_post">Compartir artículo</string>
+    <!-- Post Screen -->
+    <string name="post_not_found">Publicación no encontrada</string>
+    <string name="post_share_post">Compartir publicación</string>
     <string name="post_min_read">%1$s • %2$d min de lectura</string>
-    <string name="post_not_found">Artículo no encontrado</string>
 
-    <!-- Intereses -->
+    <!-- Interests Screen -->
     <string name="interests_title">Intereses</string>
     <string name="interests_section_topics">Temas</string>
     <string name="interests_section_people">Personas</string>
     <string name="interests_section_publications">Publicaciones</string>
 
-    <!-- Navegación -->
-    <string name="cd_navigate_up">Volver</string>
-    <string name="cd_navigate_home">Ir a la pantalla de inicio</string>
-    <string name="cd_navigate_interests">Ir a la pantalla de intereses</string>
-
-    <!-- Notificaciones -->
+    <!-- Notifications -->
     <string name="channel_name">Artículos nuevos</string>
-
     <plurals name="new_articles">
         <item quantity="one">%d artículo nuevo</item>
         <item quantity="other">%d artículos nuevos</item>
     </plurals>
 
-    <!-- Sincronización -->
+    <!-- Synchronization -->
     <string name="sync_now">Sincronizar ahora</string>
     <string name="sync_in_progress">Sincronizando…</string>
     <string name="sync_started">Sincronización iniciada</string>
     <string name="sync_completed">Sincronización completada</string>
     <string name="sync_failed">No se pudo sincronizar</string>
 
-    <!-- Búsqueda -->
-    <string name="search_not_implemented">La búsqueda todavía no está implementada</string>
-    <string name="search_not_implemented_configuration">La búsqueda todavía no está implementada en esta configuración</string>
+    <!-- Language selector -->
+    <string name="language">Idioma</string>
+    <string name="language_system">Predeterminado del sistema</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_auto">Automático</string>
+    <string name="language_english_short">EN</string>
+    <string name="language_spanish_short">ES</string>
 </resources>

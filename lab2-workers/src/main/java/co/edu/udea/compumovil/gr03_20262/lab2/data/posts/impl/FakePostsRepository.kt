@@ -16,11 +16,13 @@
 
 package co.edu.udea.compumovil.gr03_20262.lab2.data.posts.impl
 
+import android.content.Context
 import co.edu.udea.compumovil.gr03_20262.lab2.data.Result
+import co.edu.udea.compumovil.gr03_20262.lab2.data.local.FavoritesStore
+import co.edu.udea.compumovil.gr03_20262.lab2.data.local.LanguageStore
 import co.edu.udea.compumovil.gr03_20262.lab2.data.posts.PostsRepository
 import co.edu.udea.compumovil.gr03_20262.lab2.model.Post
 import co.edu.udea.compumovil.gr03_20262.lab2.model.PostsFeed
-import co.edu.udea.compumovil.gr03_20262.lab2.utils.addOrRemove
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -28,22 +30,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 
-/**
- * Implementation of PostsRepository that returns a hardcoded list of
- * posts with resources after some delay in a background thread.
- */
-class FakePostsRepository : PostsRepository {
 
-    // for now, store these in memory
-    private val favorites = MutableStateFlow<Set<String>>(setOf())
+class FakePostsRepository(
+    private val favoritesStore: FavoritesStore,
+    private val context: Context,
+) : PostsRepository {
 
     private val postsFeed = MutableStateFlow<PostsFeed?>(null)
 
-    // Used to make suspend functions that read and update state safe to call from any thread
+    private fun currentPosts(): PostsFeed =
+        if (LanguageStore.getEffectiveLanguage(context).startsWith("es")) postsEs else posts
 
     override suspend fun getPost(postId: String?): Result<Post> {
         return withContext(Dispatchers.IO) {
-            val post = posts.allPosts.find { it.id == postId }
+            val post = currentPosts().allPosts.find { it.id == postId }
             if (post == null) {
                 Result.Error(IllegalArgumentException("Post not found"))
             } else {
@@ -58,29 +58,25 @@ class FakePostsRepository : PostsRepository {
             if (shouldRandomlyFail()) {
                 Result.Error(IllegalStateException())
             } else {
-                postsFeed.update { posts }
-                Result.Success(posts)
+                postsFeed.update { currentPosts() }
+                Result.Success(currentPosts())
             }
         }
     }
 
-    override fun observeFavorites(): Flow<Set<String>> = favorites
+    override fun observeFavorites(): Flow<Set<String>> = favoritesStore.favorites
     override fun observePostsFeed(): Flow<PostsFeed?> = postsFeed
 
     override suspend fun toggleFavorite(postId: String) {
-        favorites.update {
-            it.addOrRemove(postId)
-        }
+        favoritesStore.toggle(postId)
     }
 
-    // used to drive "random" failure in a predictable pattern, making the first request always
-    // succeed
+    override suspend fun refreshFeed() {
+        postsFeed.update { currentPosts() }
+    }
+
+    // deterministic failure every 5 requests so the first request succeeds
     private var requestCount = 0
 
-    /**
-     * Randomly fail some loads to simulate a real network.
-     *
-     * This will fail deterministically every 5 requests
-     */
     private fun shouldRandomlyFail(): Boolean = ++requestCount % 5 == 0
 }

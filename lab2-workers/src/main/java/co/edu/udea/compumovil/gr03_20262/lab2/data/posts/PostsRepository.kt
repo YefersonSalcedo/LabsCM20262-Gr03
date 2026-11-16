@@ -50,4 +50,10 @@ interface PostsRepository {
      * Toggle a postId to be a favorite or not.
      */
     suspend fun toggleFavorite(postId: String)
+
+    /**
+     * Reload the posts feed with the current content (e.g. after a language change).
+     * Default no-op for repositories that don't cache a feed.
+     */
+    suspend fun refreshFeed() {}
 }

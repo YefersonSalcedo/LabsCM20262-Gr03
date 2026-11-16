@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import co.edu.udea.compumovil.gr03_20262.lab2.R
+import co.edu.udea.compumovil.gr03_20262.lab2.ui.components.LanguageDrawerSection
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.home.HomeKey
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.NAVIGATION_ITEMS
 import co.edu.udea.compumovil.gr03_20262.lab2.ui.navigation.NavigationItem
@@ -74,6 +75,10 @@ fun AppDrawer(
                 )
             }
         }
+        Spacer(Modifier.weight(1f))
+        LanguageDrawerSection(
+            modifier = Modifier.padding(bottom = 24.dp),
+        )
     }
 }
 

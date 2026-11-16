@@ -49,7 +49,7 @@ fun SelectTopicButton(modifier: Modifier = Modifier, selected: Boolean = false) 
     val backgroundColor = if (selected) {
         MaterialTheme.colorScheme.primary
     } else {
-        MaterialTheme.colorScheme.onPrimary
+        MaterialTheme.colorScheme.surfaceVariant
     }
     Surface(
         color = backgroundColor,

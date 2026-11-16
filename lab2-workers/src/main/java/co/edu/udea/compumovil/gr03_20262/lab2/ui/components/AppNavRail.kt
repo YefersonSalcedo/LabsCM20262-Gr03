@@ -75,6 +75,7 @@ fun AppNavRail(
             }
         }
         Spacer(Modifier.weight(1f))
+        LanguageRailSection()
     }
 }
 

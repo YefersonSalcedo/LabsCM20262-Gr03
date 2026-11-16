@@ -184,7 +184,7 @@ fun BookmarkButton(id: String, isBookmarked: Boolean, onToggleBookmark: (String)
         ),
         colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
         contentDescription = context.getString(
-            if (isBookmarked) R.string.unbookmark else R.string.bookmark
+            if (isBookmarked) R.string.unbookmark else R.string.bookmark,
         ),
         modifier = GlanceModifier.clickable { onToggleBookmark(id) },
     )

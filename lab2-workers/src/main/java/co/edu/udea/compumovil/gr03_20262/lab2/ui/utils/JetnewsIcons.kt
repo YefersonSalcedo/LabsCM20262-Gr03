@@ -28,16 +28,6 @@ import androidx.compose.ui.semantics.semantics
 import co.edu.udea.compumovil.gr03_20262.lab2.R
 
 @Composable
-fun FavoriteButton(onClick: () -> Unit) {
-    IconButton(onClick) {
-        Icon(
-            painter = painterResource(R.drawable.ic_thumb_up),
-            contentDescription = stringResource(R.string.cd_add_to_favorites),
-        )
-    }
-}
-
-@Composable
 fun BookmarkButton(isBookmarked: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val clickLabel = stringResource(
         if (isBookmarked) R.string.unbookmark else R.string.bookmark,
@@ -64,16 +54,6 @@ fun ShareButton(onClick: () -> Unit) {
         Icon(
             painter = painterResource(R.drawable.ic_share),
             contentDescription = stringResource(R.string.cd_share),
-        )
-    }
-}
-
-@Composable
-fun TextSettingsButton(onClick: () -> Unit) {
-    IconButton(onClick) {
-        Icon(
-            painter = painterResource(R.drawable.ic_text_settings),
-            contentDescription = stringResource(R.string.cd_text_settings),
         )
     }
 }
